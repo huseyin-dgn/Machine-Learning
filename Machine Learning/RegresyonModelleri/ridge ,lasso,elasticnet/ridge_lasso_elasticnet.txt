@@ -1,0 +1,409 @@
+Eğer dataframe bulamıyorsak ve yeni örneklerle pekiştirme yapmak istiyorsak, şu yöntem kullanılabilir; 
+
+SKLEARN DATASETS ; 
+✅ Sklearn kütüphanesinden alınan bu import örnekleri bize yeni ver, setleri sunar.
+✅ -- from sklearn.datasets import load_wine -- 
+
+ÖRNEK ;
+veri = load_wine()
+df= pd.DataFrame(data = veri.data , columns=veri.feature_names)
+df["proline"]= veri.target
+
+✅ df = pd.DataFrame(data=veri.data, columns=veri.feature_names)
+Burada, yüklenen veriyi pandas DataFrame'e dönüştürüyorsunuz:
+
+✅ veri.data, şarap türlerine dair sayısal özelliklerin (kimyasal bileşenler gibi) bulunduğu numpy dizisidir.
+
+✅ veri.feature_names, bu sayısal özelliklerin isimlerini (örneğin, alkol, asidite, vs.) içeren bir listedir.
+
+✅ df["proline"] = veri.target
+Bu satırda ise şarapların türleri (veri.target) ekleniyor. veri.target, her şarabın ait olduğu türü belirtir (genellikle 3 farklı şarap türü vardır). Bu türler, hedef değişken olarak veri setinde bulunur. df["proline"] ifadesi, DataFrame'e yeni bir sütun ekler ve bu sütun şarapların tür bilgilerini tutar.
+
+---------------- STANDART SCALER -----------------------------
+
+1. Standard Scaler Nedir?
+
+Standard Scaler, her özelliği (feature) ortalaması 0 ve standart sapması 1 olacak şekilde dönüştürür.
+
+2. Neden Standardizasyon Yapılır?
+Makine öğrenmesi modellerinde bazı algoritmalar, özelliklerin ölçeklerinden etkilenir. Standardizasyonun sağladığı avantajlar:
+
+✅ Gradient Descent Hızlanır
+
+Lineer Regresyon, Lojistik Regresyon, Yapay Sinir Ağları gibi gradyan inişi (gradient descent) kullanan algoritmalar, ölçeklendirilmemiş verilerle çok yavaş çalışır.
+✅ Özellikler Eşit Öneme Sahip Olur
+
+Eğer veri setindeki bazı özelliklerin değerleri büyük (örneğin "gelir" = 50,000) ve bazıları küçük (örneğin "yaş" = 30) ise, büyük değerli değişkenler modeli domine edebilir.
+Standardizasyon, tüm değişkenleri aynı ölçeğe getirerek adil hale getirir.
+✅ Öklid Mesafesine Dayalı Algoritmalar İçin Gerekli
+
+KNN (K-En Yakın Komşu), K-Means, PCA gibi algoritmalar Öklid mesafesi kullanır.
+Eğer özelliklerin ölçekleri farklıysa, büyük değerli özellikler mesafeyi kontrol eder.
+✅ Çoklu Doğrusal Bağlantıyı Azaltır
+
+Standardizasyon, çoklu doğrusal bağlantıyı (multicollinearity) azaltarak regresyon modellerinde katsayıların daha dengeli olmasını sağlar.
+3. Standard Scaler Hangi Durumlarda Kullanılmalı?
+📌 Kullanılması gereken durumlar:
+
+Lineer regresyon, lojistik regresyon, yapay sinir ağları, KNN, K-Means, PCA gibi ölçek duyarlı algoritmalar
+Veri setinde büyük ölçek farkları varsa
+📌 Kullanılmaması gereken durumlar:
+
+Ağaç tabanlı algoritmalar (Decision Tree, Random Forest, XGBoost) ölçeklendirmeye duyarlı değildir.
+
+Sonuç;
+Standard Scaler, makine öğrenmesi modellerinde veri ölçeklendirmeyi sağlamak, algoritmaların daha verimli çalışmasını mümkün kılmak ve değişkenler arasında adil bir karşılaştırma yapabilmek için kullanılır.
+
+-- KOD BÖLÜMÜ --
+
+# Gerekli kütüphaneyi içe aktarıyoruz
+from sklearn.preprocessing import StandardScaler
+
+# StandardScaler nesnesini oluşturuyoruz
+scaler = StandardScaler()
+
+# Eğitim verisi üzerinde fit ve transform işlemlerini uyguluyoruz
+# Bu işlem, eğitim verisinin ortalamasını 0, standart sapmasını 1 yapar
+X_train = scaler.fit_transform(X_train)  
+
+# Test verisini eğitim verisinde öğrenilen ölçekle dönüştürüyoruz
+# Burada sadece transform kullanıyoruz çünkü fit işlemi sadece eğitim setine uygulanmalı
+X_test = scaler.transform(X_test)
+
+-- AÇIKLAMALAR --
+
+1️⃣ StandardScaler() nesnesini oluşturduk.
+
+Bu nesne, veriyi ortalaması 0, standart sapması 1 olacak şekilde ölçeklendirmek için kullanılır.
+2️⃣ fit_transform(X_train) ile eğitim verisini ölçeklendirdik.
+
+fit(X_train): Ortalamayı ve standart sapmayı hesaplar.
+transform(X_train): X_train’i ölçeklendirir.
+fit_transform(X_train): Fit ve transform işlemlerini tek adımda yapar.
+3️⃣ transform(X_test) ile test verisini dönüştürdük.
+
+Test verisinin ortalamasını değiştirmek istemiyoruz.
+Eğitim verisinden öğrenilen ortalama ve standart sapmayı kullanarak aynı ölçeğe getiriyoruz.
+
+----------------------------------------------------------------------
+----------------- Ridge Regresyon (L2 Regularization) ----------------
+
+Ridge regresyon, çoklu doğrusal bağlantı (multicollinearity) ve overfitting sorunlarını çözmek için kullanılır. Lineer regresyona L2 regularizasyonu ekleyerek katsayıları küçültür ama tam sıfıra indirmez.
+
+📌 RidgeCV, en iyi regularization (α) değerini otomatik bulmamızı sağlar.
+📌 Model, overfitting’i önler ve daha sağlam hale gelir.
+📌 RMSE, MAE ve R^2
+  metrikleri ile modelin performansını değerlendiririz.
+
+1. Ridge Regresyonun Kullanım Amaçları
+✅ Çoklu Doğrusal Bağlantıyı (Multicollinearity) Azaltmak
+
+Eğer veri setinde bağımsız değişkenler (features) birbirleriyle çok ilişkiliyse (multicollinearity), normal lineer regresyon kararsız hale gelir.
+Ridge regresyon, katsayıları küçülterek modelin daha sağlam (robust) olmasını sağlar.
+
+✅ Overfitting’i Engellemek
+
+Normal lineer regresyon, eğitim verisine çok fazla uyum sağlayarak test verisinde kötü sonuç verebilir (overfitting).
+Ridge regresyon, katsayıları sınırlandırarak modelin genelleştirme gücünü artırır.
+
+✅ Yüksek Boyutlu (High-Dimensional) Verilerde Daha İyi Performans
+
+Özellikle çok fazla özellik (feature) içeren veri setlerinde, Ridge regresyon aşırı uç değerlere karşı daha dayanıklıdır.
+Örneğin, biyoenformatik, finans, görüntü işleme gibi alanlarda çok sayıda değişken içeren veri setlerinde kullanılır.
+
+👉 Eğer tüm değişkenleri kullanmak istiyorsan Ridge, bazılarını tamamen sıfırlayıp gereksiz olanları elemek istiyorsan Lasso kullan!
+👉 Eğer hem Ridge hem Lasso’nun avantajlarını istiyorsan Elastic Net kullan!
+
+-- KOD BÖLÜMÜ --
+
+# Ridge Regresyon'u içe aktarıyoruz
+from sklearn.linear_model import Ridge
+
+# Ridge modelini oluşturuyoruz ve alpha (regularization parametresi) değerini belirliyoruz
+ridge_model = Ridge(alpha=1)
+
+# Modeli eğitim verisi (X_train, y_train) ile eğitiyoruz
+ridge_model.fit(X_train, y_train)
+
+# Test verisi ile tahmin yapıyoruz
+ridge_pred = ridge_model.predict(X_test)
+
+# Performans ölçümleri için gerekli metrikleri içe aktarıyoruz
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+# R^2 (Determinasyon Katsayısı): Modelin veriyle ne kadar iyi uyum sağladığını gösterir (1'e yakın olması iyidir)
+print("R^2 : ", round(r2_score(y_test, ridge_pred), 2))
+
+# MAE (Mean Absolute Error): Gerçek ve tahmin değerleri arasındaki mutlak farkın ortalaması (daha küçük olması iyidir)
+print("MAE : ", round(mean_absolute_error(y_test, ridge_pred), 2))
+
+# RMSE (Root Mean Squared Error): Hata karelerinin ortalamasının karekökü (daha küçük olması iyidir)
+print("RMSE : ", round(mean_squared_error(y_test, ridge_pred, squared=False), 2))
+
+
+-- Kodun Adım Adım Açıklaması --
+✅ 1. Ridge Regresyon Modeli Oluşturuluyor:
+Ridge(alpha=1):
+
+alpha=1, Ridge regresyonunun regularizasyon parametresidir.
+Küçük alpha (0'a yakın) → Daha fazla esneklik → Overfitting riski artar.
+Büyük alpha → Daha fazla katsayı küçültme → Underfitting olabilir.
+✅ 2. Model Eğitiliyor:
+ridge_model.fit(X_train, y_train)
+
+Model, X_train içindeki özellikleri ve y_train içindeki hedef değişkeni kullanarak eğitilir.
+✅ 3. Test Seti Üzerinde Tahmin Yapılıyor:
+ridge_pred = ridge_model.predict(X_test)
+
+Eğitim sonrası model, X_test verisi üzerinde tahmin yapar.
+✅ 4. Modelin Başarımı Ölçülüyor:
+𝑅^2
+  (R-Kare) → Modelin veriye ne kadar iyi uyduğunu gösterir (1’e yakın olmalı).
+MAE (Ortalama Mutlak Hata) → Gerçek ve tahmin edilen değerler arasındaki mutlak farkları ölçer (küçük olmalı).
+RMSE (Kök Ortalama Kare Hata) → Hataların karekökü alınarak ölçülür (küçük olmalı).
+
+
+-- EN İYİ ALPHA DEĞERİNİ BULMAK İÇİN YAPILMASI GEREKENLER --
+
+-- Kodun Adım Adım Açıklaması--
+✅ 1. RidgeCV ile En İyi Alpha Değerini Seçiyoruz
+
+RidgeCV(alphas=[0.1, 1, 10, 100, 1000])
+Cross-validation kullanarak en iyi alpha (regularization) değerini otomatik seçer.
+En iyi alpha değeri ridge_cv.alpha_ ile bulunur.
+✅ 2. En İyi Alpha Değeriyle Ridge Modeli Eğitiyoruz
+
+Ridge(alpha=best_alpha) ile Ridge modelini en uygun regularization parametresiyle kuruyoruz.
+✅ 3. Test Seti Üzerinde Tahmin Yapıyoruz
+
+ridge_pred1 = ridge_model1.predict(X_test)
+✅ 4. Modelin Performansını Ölçüyoruz
+R^2→ Modelin veriyle uyumunu gösterir (1’e yakın olması iyi).
+MAE (Ortalama Mutlak Hata) → Hataların mutlak değerlerinin ortalaması (küçük olması iyi).
+RMSE (Kök Ortalama Kare Hata) → Hataların karesinin ortalamasının karekökü (küçük olması iyi).
+
+
+-- KOD BÖLÜMÜ --
+
+# Gerekli kütüphaneleri içe aktarıyoruz
+from sklearn.linear_model import Ridge, RidgeCV
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+# Alpha (λ) değerini en iyi seçmek için RidgeCV kullanıyoruz
+# Belirli alpha değerleri arasından en iyisini bulur
+
+ridge_cv = RidgeCV(alphas=[0.1, 1, 10, 100, 1000], store_cv_values=True)
+
+# store_cv_values=True, RidgeCV modelini kullanırken çapraz doğrulama (cross-validation) değerlerinin saklanmasını sağlar. Bu, modelin performansını değerlendirmek için kullanılan çapraz doğrulama sürecinin ayrıntılarını saklamak amacıyla kullanılır.
+
+
+# Modeli eğitim verisiyle eğitiyoruz
+ridge_cv.fit(X_train, y_train)
+
+# En iyi alpha değerini buluyoruz
+best_alpha = ridge_cv.alpha_
+print("En iyi alpha değeri:", best_alpha)
+
+# En iyi alpha değeriyle Ridge modelini oluşturuyoruz
+ridge_model1 = Ridge(alpha=best_alpha)
+
+# Modeli eğitiyoruz
+ridge_model1.fit(X_train, y_train)
+
+# Test seti üzerinde tahmin yapıyoruz
+ridge_pred1 = ridge_model1.predict(X_test)
+
+# Performans ölçümlerini yazdırıyoruz
+print("R^2 : ", round(r2_score(y_test, ridge_pred1), 2))
+print("MAE : ", round(mean_absolute_error(y_test, ridge_pred1), 2))
+print("RMSE : ", round(mean_squared_error(y_test, ridge_pred1, squared=False), 2))
+
+r^2 = 0.85
+mae = 0.26 = 1 alpha için
+rmse = 0.1
+
+R^2 :  0.85
+MAE :  0.25 = 10 alpha için
+RMSE :  0.1
+
+R^2 :  0.8
+MAE :  0.3 = 100 alpha için
+RMSE :  0.13
+
+-----------------------------------------------------------------------------------
+------------------------------ LASSO ---------------------------------------
+
+📌 Lasso Neden Kullanılır?
+Lasso (Least Absolute Shrinkage and Selection Operator) regresyonu, özellik seçimi (feature selection) ve model sadeleştirme amacıyla kullanılır.
+
+✅ Lasso Kullanım Amaçları
+
+1️⃣ Gereksiz Değişkenleri (Özellikleri) Eleme (Feature Selection)
+Lasso, bazı katsayıları sıfıra çekerek gereksiz özellikleri tamamen çıkarır.
+Eğer veri setinde çok fazla gereksiz değişken varsa, Lasso önemli olanları bırakıp diğerlerini sıfır yapar.
+📌 Örnek:
+Eğer bir veri setinde 100 değişken varsa ve 30'u gereksizse, Lasso bunları sıfıra indirerek modeli sadeleştirir.
+
+2️⃣ Daha Basit ve Yorumlanabilir Modeller Üretme
+Modelin daha az değişkenle çalışmasını sağlar, böylece yorumlaması ve analiz edilmesi kolay olur.
+Çok fazla değişken içeren bir model yerine, sadece en önemli değişkenleri içeren bir model daha iyi olabilir.
+
+--- KOD BÖLÜMÜ ---
+
+# 📌 Gerekli kütüphaneleri içe aktarıyoruz
+from sklearn.linear_model import LassoCV
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+# 📌 LassoCV modelini oluşturuyoruz
+lasso_cv = LassoCV(
+    eps=0.1,        # Alpha değerleri arasında minimum ve maksimum oranını belirler.
+                    # (min_alpha = eps * max_alpha)
+    n_alphas=100,   # Alpha için 100 farklı değer belirlenir ve çapraz doğrulama ile en iyisi seçilir.
+    cv=5            # 5 katlı çapraz doğrulama (Veriyi 5 parçaya böler, her parça için modeli test eder)
+)
+
+# 📌 Modeli eğitim verisi ile eğitiyoruz
+lasso_cv.fit(X_train, y_train)
+
+# 📌 Seçilen en iyi Alpha değerini yazdırıyoruz
+print("Seçilen en iyi alpha değeri:", lasso_cv.alpha_)
+
+# 📌 Modelin katsayılarını yazdırıyoruz
+print("Modelin katsayıları (coef_):", lasso_cv.coef_)
+
+# 📌 Lasso bazı katsayıları sıfıra indirebilir (Gereksiz gördüğü değişkenleri tamamen kaldırır)
+# Eğer bazı katsayılar 0 ise, Lasso o değişkenleri önemli görmediğini belirtmiş olur.
+
+# 📌 Test verisi ile tahmin yapıyoruz
+lasso_pred = lasso_cv.predict(X_test)
+
+# 📌 Modelin performansını değerlendiriyoruz
+print("R^2 : ", round(r2_score(y_test, lasso_pred), 2))  # Modelin açıklayıcılık oranı
+print("MAE : ", round(mean_absolute_error(y_test, lasso_pred), 2))  # Ortalama mutlak hata
+print("RMSE : ", round(mean_squared_error(y_test, lasso_pred, squared=False), 2))  # Kök ortalama kare hata
+
+--- KODUN AÇIKLAMASI ---
+
+📌 Kodun Açıklaması
+LassoCV Modeli Tanımlandı
+
+-- eps=0.1 → Alpha değerleri arasında minimum ve maksimum oranını belirler.
+
+Artarsa: Daha geniş bir alpha aralığı seçilir ve daha fazla potansiyel alpha değeri denenir.
+Azalırsa: alpha değerleri daha dar bir aralıkta kalır, bu da modelin cezalandırma seviyelerini daha sınırlı tutar.
+
+-- n_alphas=100 → 100 farklı ceza katsayısı (alpha) denenecek.
+
+Artarsa: Daha fazla alpha değeri denenir, yani daha ince bir seçim yapılır. Bu, daha doğru sonuçlar verebilir ama aynı zamanda işlem süresini uzatabilir.
+Azalırsa: Daha az alpha değeri denenir, işlem süresi daha kısa olur ancak modelin doğru sonucu bulma olasılığı azalabilir.
+
+cv=5 → 5 katlı çapraz doğrulama ile en iyi alpha değeri belirlenecek.
+
+Bu parametre, çapraz doğrulama sırasında veri kümesini kaç katman (fold) halinde böleceğinizi belirtir. 5 katlı çapraz doğrulama, veri kümesini 5 parçaya böler ve her birini sırasıyla test seti olarak kullanır, kalan 4 parçayı ise eğitim seti olarak kullanır.
+Artarsa: Daha fazla katmanlı çapraz doğrulama yapılır, modelin daha genellenebilir olma olasılığı artar ancak işlem süresi de uzar.
+Azalırsa: Çapraz doğrulama daha hızlı gerçekleşir, fakat modelin genellenebilirliği düşebilir.
+
+
+Model Eğitildi (fit ile)
+
+lasso_cv.alpha_ → En iyi bulunan alpha değeri alındı.
+lasso_cv.coef_ → Modelin belirlediği katsayılar alındı. Bazı katsayılar sıfır olabilir!
+Tahmin Yapıldı (predict ile)
+
+lasso_pred = lasso_cv.predict(X_test) → Model test verisi için tahmin yaptı.
+Modelin Performansı Ölçüldü
+
+R² → Modelin açıklayıcılık oranı (Ne kadar iyi tahmin yapıyor?)
+MAE → Ortalama mutlak hata (Gerçek değerlerle tahminler arasındaki farkın ortalaması)
+RMSE → Kök ortalama kare hata (Tahminlerin doğruluğunu ölçmek için daha duyarlı bir hata metriği)
+
+
+🚀 Özet
+✔ Lasso, bazı değişkenlerin katsayılarını sıfıra çekerek gereksiz değişkenleri ortadan kaldırır.
+✔ Özellik seçimi yaparak daha basit ve yorumlanabilir modeller oluşturur.
+✔ Aşırı öğrenmeyi azaltabilir, genelleştirilebilir modeller oluşturabilir.
+✔ Özellikle yüksek boyutlu veri setlerinde gereksiz özellikleri eleyerek daha iyi performans sağlar.
+
+📌 Eğer tüm katsayılar sıfır değilse, Ridge regresyonu kullanmak daha mantıklı olabilir.
+📌 Eğer sadece en önemli değişkenleri seçmek istiyorsak, Lasso daha iyi bir seçenek olur.
+-----------------------------------------------------------------------------------
+-------------------------- ELASTİC-NET ---------------------------------------
+
+from sklearn.linear_model import ElasticNetCV
+
+elastic_model = ElasticNetCV(l1_ratio= (0.01 , 0.1, 0.2 , 0.3,0.4 ,0.5 , 0.6 , 0.7 , 0.8 , 0.9 , 0.95 , 0.99 , 1) , tol=0.01)
+
+
+1️⃣ l1_ratio Nedir?
+ElasticNet, hem Lasso (L1 cezası) hem de Ridge (L2 cezası) regresyonlarını birleştiren bir yöntemdir.
+
+🔹 l1_ratio, L1 (Lasso) ile L2 (Ridge) arasındaki dengeyi ayarlar.
+
+ℹ️ l1_ratio İçin Değerler ve Anlamları
+
+l1_ratio		Model Türü
+0		Sadece Ridge (L2 cezası) uygulanır.
+1		Sadece Lasso (L1 cezası) uygulanır.
+0.5		L1 ve L2 cezasının eşit karışımı (ElasticNet)
+0 < l1_ratio < 1	L1 ve L2'nin karışımı (ElasticNet)
+📌 Kodundaki l1_ratio parametresi bir dizi (tuple) olarak verilmiş.
+
+(0.01, 0.1, 0.2, ..., 1) değerleri denenerek en iyi oran (l1_ratio) seçilir.
+Bu sayede, model farklı L1-L2 kombinasyonlarını test ederek en iyi dengeyi belirler.
+
+2️⃣ tol (Tolerans) Nedir?
+🔹 tol, optimizasyon sürecinin hassasiyetini (erken durdurma toleransını) belirler.
+
+Küçük tol değerleri → Daha hassas ama daha yavaş hesaplama.
+Büyük tol değerleri → Daha hızlı ama daha az hassas sonuç.
+ℹ️ Genellikle tol=0.0001 gibi küçük değerler tercih edilir. Ancak kodundaki tol=0.01, optimizasyon sürecini biraz hızlandıracaktır.
+
+🔥 Özet
+✔ l1_ratio, L1 (Lasso) ve L2 (Ridge) regresyonları arasındaki dengeyi ayarlar.
+✔ tol, optimizasyon sürecinin hassasiyetini belirleyerek erken durdurma toleransını kontrol eder.
+
+--- 🔥 KOD BÖLÜMÜ 🔥 ---
+
+# Gerekli kütüphaneyi içe aktarıyoruz
+from sklearn.linear_model import ElasticNetCV
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+# ElasticNetCV modelini oluşturuyoruz
+elastic_model = ElasticNetCV(
+    l1_ratio=(0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1),  # L1 ve L2 dengesini belirleyecek değerler
+    tol=0.01  # Optimizasyon hassasiyeti (erken durdurma toleransı)
+)
+
+# Modeli eğitim verisi ile eğitiyoruz
+elastic_model.fit(X_train, y_train)
+
+# Seçilen en iyi L1 oranını alıyoruz
+print("En iyi L1 oranı (l1_ratio_):", elastic_model.l1_ratio_)
+
+# Modelin tahmin için kullanacağı katsayıları alıyoruz
+print("Model katsayıları (coef_):", elastic_model.coef_)
+
+# Eğer coef_'lerin hiçbiri sıfır değilse, Ridge regresyonun ağırlıklı olarak seçildiğini anlıyoruz.
+# L1 cezası (Lasso) bazı katsayıları sıfıra çektiği için, sıfır olmayan tüm katsayılar Ridge etkisini gösterir.
+
+# Test verisi üzerinde tahmin yapıyoruz
+elastic_pred = elastic_model.predict(X_test)
+
+# R^2 skorunu hesaplıyoruz (modelin açıklayıcılık oranı)
+print("R^2 : ", round(r2_score(y_test, elastic_pred), 2))
+
+# Ortalama mutlak hata (MAE) hesaplanıyor
+print("MAE : ", round(mean_absolute_error(y_test, elastic_pred), 2))
+
+# Kök ortalama kare hata (RMSE) hesaplanıyor
+print("RMSE : ", round(mean_squared_error(y_test, elastic_pred, squared=False), 2))  # squared=False RMSE hesaplar
+
+
+🚀 Kodun Ne Yapıyor?
+Bu kod, farklı L1-L2 oranlarını (l1_ratio) test ederek en iyi ElasticNet modelini bulmaya çalışıyor. Tolerans 0.01 olarak ayarlandığı için, çok küçük değişikliklerde model eğitimi durabilir, yani model biraz daha hızlı çalışacaktır.
+
+
+
+
+
+

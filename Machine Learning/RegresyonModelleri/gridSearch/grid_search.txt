@@ -1,0 +1,170 @@
+🔍 Grid Search Nedir ? 🔍
+ 
+Grid search, makine öğrenmesi ve derin öğrenme modellerinde hiperparametre optimizasyonu yapmak için kullanılan bir yöntemdir. Modelin performansını artırmak amacıyla, belirli hiperparametreler (örneğin, öğrenme oranı, batch boyutu, modelin katman sayısı) üzerinde tüm olası kombinasyonları sistematik bir şekilde tarar.
+
+Grid search, her bir hiperparametre için bir değer aralığı tanımlar ve bu aralıktaki tüm değerlerin birleşiminden oluşan bir grid (ızgara) oluşturur. Daha sonra bu griddeki her bir kombinasyonla model eğitilir ve en iyi sonucu veren hiperparametreler seçilir.
+
+🎯 Grid Search'in Kullanım Amacı ? 🎯
+
+Grid search, modelin en iyi hiperparametreleriyle çalışmasını sağlamak için kullanılır. Modelin hiperparametreleri, öğrenme süreci üzerinde büyük bir etkiye sahiptir ve doğru hiperparametreler, modelin genelleme yeteneğini artırabilir. Grid search, farklı hiperparametre değerlerini deneyerek en iyi performansı gösteren kombinasyonu bulmayı amaçlar.
+
+🏆 Grid Search'in Avantajları
+
+Basit ve Kolay Uygulama ✅
+Grid search, hiperparametreleri belirli bir aralıkta sistematik bir şekilde tarar. Bu işlem, hem yeni başlayanlar hem de deneyimli kullanıcılar için oldukça anlaşılır ve basittir.
+
+Tüm Kombinasyonları Dener 🔄
+Grid search, seçilen hiperparametrelerin tüm olasılıklarını dener. Bu, modelin global optimum çözümüne ulaşma şansını artırır.
+
+Performans İyileştirmesi 📈
+Hiperparametreler doğru seçildiğinde, modelin doğruluğu önemli ölçüde iyileşebilir. Grid search bu doğruluğu artırmak için etkili bir yöntem sunar.
+
+Paralel İşlem Yapılabilir 💻
+Grid search, farklı hiperparametre kombinasyonlarını paralel olarak çalıştırabilir, bu da özellikle büyük veri setlerinde zaman tasarrufu sağlar.
+
+Detaylı Sonuçlar Sunar 📊
+Grid search, her kombinasyonun model üzerindeki etkilerini raporlayarak, en iyi sonucu veren hiperparametreleri bulmanıza olanak tanır.
+
+⚠️ Grid Search'in Dezavantajları
+
+Hesaplama Zorluğu 🖥️
+Çok sayıda hiperparametre ve geniş aralıklar seçildiğinde grid search hesaplama açısından çok zaman alıcı olabilir. Özellikle büyük veri setlerinde bu işlem daha da uzun sürebilir.
+
+Düşük Verimli 🕒
+Grid search, tüm kombinasyonları denerken bazı parametreler için daha uygun olan değerlerin yer aldığı küçük bir bölgeyi kaçırabilir, bu da verimli olmayabilir.
+
+Büyük Hiperparametre Alanlarında Zorlayıcı ⚡
+Hiperparametrelerin sayısı arttıkça, grid search ile denenecek kombinasyonların sayısı katlanarak artar. Bu, hem zaman hem de kaynak açısından maliyetli olabilir.
+
+📊 Grid Search Nasıl Uygulanır?
+Hiperparametrelerin bir aralığını seçin (örneğin, öğrenme oranı: 0.001, 0.01, 0.1).
+Bu parametreler için tüm olasılıkları içeren bir grid oluşturun.
+Modeli her bir kombinasyon ile eğitin ve performansını ölçün.
+En iyi sonucu veren hiperparametreleri seçin.
+Grid search, doğru kullanıldığında modelin performansını artırmak için güçlü bir araç olabilir. Ancak, büyük parametre uzaylarında alternatif yöntemler, örneğin random search veya Bayesian optimization, daha verimli sonuçlar verebilir.
+
+
+		-- KOD BÖLÜMÜNÜ BERABER İNCELEYELİM --
+
+1️⃣ Veri Setini Bölme (train_test_split)
+
+from sklearn.model_selection import train_test_split
+
+# X: Bağımsız değişkenler, y: Bağımlı değişken
+# test_size=0.3: Verinin %30'u test seti, %70'i eğitim seti olarak ayrılır
+# random_state=9: Aynı sonucu elde etmek için sabit rastgelelikik kullanılır
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=9)
+
+2️⃣ Veri Standardizasyonu (StandardScaler)
+
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()  # Standartlaştırma için bir scaler nesnesi oluşturuluyor
+scaler.fit(X_train)  # Eğitim verisine göre scaler'ı fit ediyoruz (ortalama ve standart sapma hesaplanır)
+X_train = scaler.transform(X_train)  # Eğitim verisini standartlaştırıyoruz (ortalama 0, std 1)
+X_test = scaler.transform(X_test)  # Test verisini de aynı şekilde dönüştürüyoruz
+
+3️⃣ ElasticNet Modeli ve GridSearchCV Kullanımı
+
+from sklearn.linear_model import ElasticNet
+from sklearn.model_selection import GridSearchCV
+
+elasticnet = ElasticNet()  # ElasticNet modelini başlatıyoruz (hem Lasso hem Ridge kombinasyonu)
+
+# Grid Search için parametreler
+params = {
+    "alpha": [.01 , .1 , 1 , 5 ,10 , 50 , 100 , 1000],  # Regülerizasyon gücü için farklı alpha değerleri
+    "l1_ratio":[.001 , 0.01 , 0.1 , .5  , .7 , .9 , .95 , .99]  # Lasso ve Ridge kombinasyon oranları için farklı değerler
+}
+
+# GridSearchCV kullanarak modelin hiperparametrelerini optimize edeceğiz
+grid_model = GridSearchCV(
+    estimator=elasticnet,  # Kullandığımız model: ElasticNet
+    param_grid=params,  # Parametre grid'i: Denenecek alpha ve l1_ratio kombinasyonları
+    scoring="neg_mean_squared_error",  # Modeli negatif ortalama kare hata (MSE) ile değerlendiriyoruz
+    cv=5,  # 5 katlamalı çapraz doğrulama
+    verbose=2  # İşlem sırasında daha fazla bilgi almak için verbose=2 kullanıyoruz
+)
+
+# Eğitim verisiyle GridSearchCV'yi eğitiyoruz
+grid_model.fit(X_train , y_train)
+
+# En iyi parametreleri ve modelin en iyi tahminciyi görmek için:
+grid_model.best_estimator_  # En iyi parametrelerle eğitilen model
+
+# GridSearchCV'nin sonuçlarını DataFrame formatında görüntülüyoruz
+grid_result = pd.DataFrame(grid_model.cv_results_)
+
+# Modelin performansını test verisi ile değerlendiriyoruz:
+y_pred = grid_model.predict(X_test)  # Test verisiyle tahmin yapıyoruz
+
+from sklearn.metrics import mean_squared_error
+# Gerçek ve tahmin edilen değerler arasındaki kök ortalama kare hata (RMSE) hesaplıyoruz
+np.sqrt(mean_squared_error(y_test , y_pred))  # RMSE değeri
+
+
+			 ---- ⚠️ Açıklamalar ⚠️ ----
+
+1- ) train_test_split: Veri setini eğitim ve test olarak ayırır. random_state sabitlenerek sonuçların her seferinde aynı olmasını sağlarız.
+
+2- ) StandardScaler: Veriyi standartlaştırmak için kullanılır. Özelliklerin farklı ölçekleri modelin öğrenmesini zorlaştırabilir. Bu adımda her özelliği aynı ölçeğe getiriyoruz.
+
+3- ) ElasticNet: Hem Lasso hem de Ridge regresyonunun birleşimi olan bir modeldir. Bu model, veri setlerinde fazla özelliği olan durumlarda veya çoklu doğrusal ilişkiler olduğunda faydalıdır.
+
+4- ) GridSearchCV: Bu yöntem, modelin hiperparametrelerini sistematik bir şekilde arar. Grid search ile modelin performansı, parametre kombinasyonları üzerinden optimize edilir. Burada kullandığımız scoring="neg_mean_squared_error", modeli negatif ortalama kare hata ile değerlendirir (daha düşük hata, daha iyi sonuç).
+
+
+		---- 🤖 Neden ElasticNet Kullanıldı? 🤖 ----
+
+ElasticNet, Lasso ve Ridge regresyonunun birleşimidir. İşte kullanılma sebepleri:
+
+1️⃣ Lasso (L1) ve Ridge (L2) Avantajlarını Birleştirme
+Lasso: Özellik seçimi yaparak bazı katsayıları sıfıra indirir.
+Ridge: Özelliklerin katsayılarını küçültür ama sıfır yapmaz.
+
+2️⃣ Çoklu Doğrusal Bağlantı Sorunları
+ElasticNet, çoklu doğrusal bağlantı (multicollinearity) olan veri setlerinde daha iyi sonuçlar verir.
+
+3️⃣ Yüksek Boyutlu Veri Setleri
+Fazla özellik olduğunda, ElasticNet her iki regülerizasyon türünü kullanarak genellenebilir bir model oluşturur.
+
+4️⃣ Daha İyi Genellenebilirlik
+Eğitim verisiyle çok uyum sağlama (overfitting) sorununu önleyerek test verisinde daha sağlam sonuçlar elde edilir.
+ElasticNet, bu özellikleriyle dengeleme sağlar ve daha doğru tahminler yapar.
+
+
+📊 GridSearchCV Sonuçları Ne Anlama Geliyor? 🤔
+GridSearchCV sonuçlarınız, ElasticNet modelinin farklı parametre kombinasyonları ile nasıl performans gösterdiğini anlamanızı sağlar. İşte sütunların anlamları:
+
+1️⃣ mean_fit_time: Modelin eğitim süresinin ortalama değeri (saniye cinsinden).
+
+2️⃣ std_fit_time: Eğitim süresinin değişkenliği (standart sapma).
+
+3️⃣ mean_score_time: Modelin tahmin yapma süresinin ortalama değeri.
+
+4️⃣ std_score_time: Tahmin süresinin değişkenliği (standart sapma).
+
+5️⃣ param_alpha: ElasticNet'in alpha parametresi değeri.
+
+6️⃣ param_l1_ratio: ElasticNet'in l1_ratio parametresi (Lasso ve Ridge oranı).
+
+7️⃣ params: Kullanılan parametrelerin tümü (alpha ve l1_ratio).
+
+8️⃣ split0_test_score - split4_test_score: 5 katlamalı çapraz doğrulamada elde edilen test puanları.
+
+9️⃣ mean_test_score: Test setinin ortalama puanı.
+
+🔟 std_test_score: Test puanlarının standart sapması.
+
+1️⃣1️⃣ rank_test_score: En iyi modelin sıralaması (1 en iyi).
+
+🎯 Örnek:
+En iyi model: param_alpha = 0.01, param_l1_ratio = 0.001 kombinasyonu ile mean_test_score = -95.17. Bu model, 6. sırada yer alıyor ve en iyi sonucu veriyor.
+
+Daha kötü sonuçlar: param_alpha = 1000, param_l1_ratio = 0.5 kombinasyonu mean_test_score = -136.13 ve 43. sırada yer alıyor.
+
+🔑 Özet:
+En iyi parametre kombinasyonunu bulmak için rank_test_score kullanarak sıralama yapılabilir.
+Düşük mean_test_score ve rank_test_score = 1 en iyi modelin göstergesidir.
+
+

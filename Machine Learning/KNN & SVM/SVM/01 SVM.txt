@@ -1,0 +1,680 @@
+				🤖📊 Destek Vektör Makineleri (SVM) Nedir? 🤖📊
+
+SVM, sınıflandırma (classification) ve regresyon (regression) problemlerinde kullanılan güçlü bir makine öğrenmesi algoritmasıdır. Temel amacı, veri noktalarını en iyi şekilde ayıran bir hiper düzlem (hyperplane) bulmaktır. 🚀
+
+				🤔 SVM Neden Kullanılır? 🤔
+
+✅ Karmaşık Verilerde Güçlüdür – Veri kümesi çok boyutlu ve karmaşıksa bile iyi sonuçlar verir.
+✅ Küçük Veri Setlerinde İyi Çalışır – Çok fazla veri gerektirmeden etkili olabilir.
+✅ Aykırı Değerlere Dayanıklıdır – Destek vektörleri sayesinde veri setindeki gereksiz gürültülerden daha az etkilenir.
+✅ Çekirdek (Kernel) Trikleriyle – Doğrusal olmayan (nonlinear) verileri bile ayırabilir. (Örn: RBF, Polinomial çekirdekler)
+
+				🌲 SVM 🤖 vs. Decision Tree 🌲
+
+Çalışma Mantığı:
+
+SVM 🤖: Hiper düzlemle verileri en iyi şekilde ayırmaya çalışır. 📏
+Decision Tree 🌲: Veriyi dallara bölerek, if-else mantığıyla karar verir. 🌳
+Ölçeklendirme:
+
+SVM 🤖: Genellikle gereklidir. 🔄
+Decision Tree 🌲: Çoğu zaman gerekmez. 🚫
+Aykırı Değerlere Duyarlılık:
+
+SVM 🤖: Daha az duyarlıdır, destek vektörleri sayesinde aykırı değerlere dayanıklıdır. 👍
+Decision Tree 🌲: Aykırı değerlere karşı daha hassastır ve aşırı öğrenmeye meyillidir. 😕
+Öğrenme Şekli:
+
+SVM 🤖: Küçük veri setlerinde güçlüdür ve iyi genelleme yapar. 📊
+Decision Tree 🌲: Büyük veri setlerinde daha hızlı çalışır ve veri arttıkça performansı daha iyidir. 🚀
+Model Karmaşıklığı:
+
+SVM 🤖: Daha matematiksel ve karmaşıktır, çekirdek (kernel) fonksiyonları kullanarak doğrusal olmayan verileri de ayrıştırabilir. 📐
+Decision Tree 🌲: Daha sezgisel ve yorumlanabilir, ağaç yapısı sayesinde kolay anlaşılır. 🧐
+
+🔹 Özetle:
+
+SVM, özellikle yüksek boyutlu ve karmaşık verilerde daha iyi genelleme yaparken, Decision Tree daha hızlı çalışır ve yorumlaması daha kolaydır.
+Aykırı değerlere karşı dayanıklı bir model istersen SVM tercih edebilirsin.
+Hız ve açıklanabilirlik ön plandaysa Decision Tree daha iyi bir seçenek olabilir.
+
+					🛠️ SVM Adımları
+
+📌 1. Veri Hazırlama & Keşifsel Veri Analizi (EDA)
+📌 2. SVM Modelinin Kurulması
+📌 3. C Parametresinin Etkisi
+📌 4. Kernel Türleri ve Etkileri
+🔹 Linear Kernel
+🔹 RBF Kernel
+🔹 Sigmoid Kernel
+🔹 Polynomial Kernel
+📌 5. Gamma Parametresinin Etkisi (RBF Kernel)
+📌 6. Grid Search ile En İyi Modeli Bulma
+📌 7. Final Model ve Değerlendirme
+
+
+				📌 1. Veri Hazırlama & Keşifsel Veri Analizi (EDA)
+
+Normalden farklı bir veri hazırlama işlemi yapmıyoruz.Diğer txt dosyalarından erişebilirsiniz.Yalnızca yeni bir görselleştirme ekleyeceğiz.Dosyaların içerisinde bulunan py dosyaları bizim görüntü ile anlamamızı sağlayacak.Şu şekilde importluyoruz.
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+from svm_margin_plot import plot_svm_boundary
+
+sns.scatterplot(x="Limon" ,y="Sirke", data=df , hue="Turşu" , palette="bright")
+
+
+				📌 2. SVM Modelinin Kurulması
+
+Model kurulumlarının iç taraflarına girdiğimizde bazı kernel , c ve gamma değerleri bizi karşılayacak.
+
+X = df.drop("Turşu", axis=1)
+y = df["Turşu"]
+
+from sklearn.svm import SVC
+# support vector machine : svm
+# support vector classifier: svc
+
+from svm_margin_plot import plot_svm_boundary
+
+Kernel Türleri
+
+Linear (kernel="linear"): Veriler doğrusal olarak ayrılabiliyorsa kullanılır.
+RBF (kernel="rbf"): Doğrusal olmayan verilerde kullanılır, gamma parametresi ile kontrol edilir.
+Sigmoid (kernel="sigmoid"): Sinir ağı benzeri bir yaklaşım sağlar, doğrusal olmayan ayrımlarda kullanılır.
+Polynomial (kernel="poly"): Verileri polinom derecesine göre ayırır, degree parametresi ile kontrol edilir.
+
+C (Penalty) Parametresi
+Büyük C: Hata toleransı düşük, marjin dar, overfitting riski yüksek.
+Küçük C: Hata toleransı yüksek, marjin geniş, underfitting riski olabilir.
+
+Gamma (γ) Parametresi
+Küçük Gamma: Daha genel karar sınırları, düşük varyans, yüksek bias, underfitting riski.
+Büyük Gamma: Daha detaylı ve hassas karar sınırları, yüksek varyans, düşük bias, overfitting riski.
+
+
+				📌3. Lineer Model ve C Parametresi
+
+	📌 Lineer Model ve C Parametresi
+
+📌 Lineer SVM Modeli
+svc_model = SVC(kernel="linear", C=1)  
+svc_model.fit(X, y)
+  
+📌 C=1 Varsayılan Değer
+
+🔹 SVM'deki C Parametresi: Marjin genişliği ve sınıflandırma hatası arasındaki dengeyi kontrol eder.
+✔️ C=1: Dengeli bir marjin sağlar.
+✔️ Kesik çizgiler (support vectors) daha geniş bir alana yayılır.
+✔️ Model, bazı hatalara izin vererek genelleme gücünü artırır.
+
+
+📌 C = 324
+
+svc_model = SVC(kernel="linear", C=324)
+svc_model.fit(X,y)
+
+⚠️ C=324: Marjin daralır, model veriye daha sıkı uyar.
+⚠️ Kesik çizgiler (support vectors) birbirine daha yaklaşır.
+⚠️ Model, sınırlara yakın noktaları daha hassas bir şekilde hesaba katar.
+
+
+📌 C Parametresinin Etkisi
+
+🔵 Büyük C (örn: C=1000)
+✔️ Hata toleransı düşük → Model veriye daha fazla uyar.
+⚠️ Düşük bias, yüksek varyans → Overfitting riski artar.
+📏 Marjin daralır, karar sınırları katı hale gelir.
+🎯 Gürültülü verilere karşı daha duyarlıdır.
+
+🟢 Küçük C (örn: C=0.1)
+
+📏 Daha geniş marjin → Bazı yanlış sınıflandırmalara izin verir.
+⚠️ Daha yüksek bias, düşük varyans → Underfitting riski olabilir.
+🔄 Modelin genelleme gücü artar.
+💪 Gürültülü verilere karşı daha dayanıklıdır.
+
+
+📌 C’nin Grafikteki Etkisi
+
+plot_svm_boundary(svc_model, X, y)
+
+🎨 Grafikte C=1: Orta seviyede bir marjin genişliği sağlar.
+
+📌 Büyük C Kullanımı
+
+svc_model = SVC(kernel="linear", C=324)
+svc_model.fit(X, y)  
+plot_svm_boundary(svc_model, X, y)
+
+📉 C Büyüdükçe: Karar sınırları sıkılaşır, marjin daralır.
+
+📌 Küçük C Kullanımı
+
+svc_model = SVC(kernel="linear", C=0.01)
+svc_model.fit(X, y)  
+plot_svm_boundary(svc_model, X, y)
+
+📈 C Küçüldükçe: Karar sınırları genişler, marjin büyür.
+
+📌 Özet:
+✅ C büyükse → Daha kesin sınıflandırma, overfitting riski artar.
+✅ C küçükse → Daha geniş marjin, underfitting riski olabilir.
+
+
+				📌4. Kernel Türleri ve Etkileri
+
+	📌 RBF (Radial Basis Function) Kernel
+
+	📌 Sigmoid Kernel
+
+	📌 Polynomial Kernel
+
+
+📌 RBF (Radial Basis Function) Kernel
+
+svm_model = SVC(kernel="rbf", gamma=0.3)
+svm_model.fit(X,y)
+plot_svm_boundary(svm_model, X,y)
+
+RBF Kernel: Kernel yöntemlerinden biri olan Radial Basis Function, doğrusal olarak ayrılamayan, karmaşık verilere uygulanmak için kullanılır. SVM'deki doğrusal olmayan ayrımlarda sıklıkla tercih edilir.
+
+Gauss (Gaussian) Çekirdeği: RBF, Gauss çekirdeği olarak da bilinir ve veriler arasındaki mesafeleri kullanarak ayrım yapar.
+
+🔍 RBF Kernel’in Özellikleri: 🔍
+
+Yerel İlişkiler: RBF, yakın komşulara daha fazla önem verir. Yani, veriler arasındaki mesafeleri ve yerel yapıları öğrenir.
+
+Yüksek Boyutlu Verilerde Güçlüdür: Düşük boyutlu verilerde de etkili olabilir, ancak özellikle yüksek boyutlu veri kümelerinde daha güçlüdür.
+
+ ⚠️ Gamma (γ) Parametresi ⚠️
+
+Gamma (γ), RBF kernel'inin etki alanını belirler. Gamma'nın değeri, çekirdeğin ne kadar hassas veya geniş olacağını kontrol eder.
+
+Küçük Gamma: Karar sınırları daha düz olur, model daha az hassaslaşır (underfitting riski).
+Büyük Gamma: Karar sınırları daha keskin olur, model daha hassas hale gelir (overfitting riski).
+
+1. Gamma = 0.003 (Küçük Gamma) ⚖️
+
+svm_model = SVC(kernel="rbf", gamma=0.003)
+svm_model.fit(X,y)
+plot_svm_boundary(svm_model, X,y)
+
+Karar sınırı: Düz ve genelleyici. 🌄
+Model Tepkisi: Düşük gamma değeri, modelin daha düz tepki vermesine neden olur. Veriyi çok sert şekilde ayırmaz, daha geniş bir bölgeyi kapsar.
+Genelleme: Bu modelin genelleme kapasitesi yüksek. 😌 Eğitim verisine aşırı uymadığından, yeni verilere de daha iyi tahminler yapma potansiyeli taşır.
+Risk: Bu durumda overfitting riski daha düşük, ancak bazı küçük yapıları kaçırma ihtimali de olabilir.
+Düşük gamma, modelin daha sade ve düzgün tepki vermesini sağlar. Ancak çok küçük gamma, bazı karmaşık ilişkileri göz ardı edebilir.
+
+2. Gamma = 0.3 (Büyük Gamma) 🔥
+
+svm_model = SVC(kernel="rbf", gamma=0.3)
+svm_model.fit(X,y)
+plot_svm_boundary(svm_model, X,y)
+
+Karar sınırı: Daha karmaşık ve keskin. 💀
+Model Tepkisi: Daha hassas ve ince ayrıntılara dikkat eden bir karar sınırı oluşturur. Eğitim verisine çok daha yakın tepki verir.
+Overfitting: Bu değer, modelin eğitildiği verilere fazla uyum sağlamasına (overfitting) yol açar. Çünkü çok fazla ince ayrıntıya girer, genel yapıdan sapabilir. 🧠
+Risk: Overfitting nedeniyle, model yalnızca eğitim verisine iyi uyum sağlar, ama yeni verilere uygulandığında performansı düşebilir. 📉
+Yüksek gamma, modelin çok hassas ve eğitim verisine yakın tepki vermesini sağlar. Ancak bu, genelleme kapasitesini sınırlayarak sadece eğitim seti üzerinde başarılı olmasına yol açar.
+
+3. Varsayılan Gamma (Sadece RBF) 🔄
+
+svc_model = SVC(kernel="rbf")
+svc_model.fit(X,y)
+plot_svm_boundary(svc_model , X, y)
+
+Karar sınırı: Orta seviye karmaşıklıkta. ⚙️
+Model Tepkisi: Varsayılan gamma, modelin dengeyi sağladığı bir durumdur. Ne çok düz ne de çok hassastır.
+Overfitting Riski: Bu model, gamma değeri üzerinden düzgün bir sınır belirler ve genellikle daha iyi genellemeler yapar. Çünkü eğitim verisine aşırı uyum sağlamaz.
+Varsayılan gamma, modelin eğitim verisine ne çok uyum sağlamasını ne de çok uzaklaşmasını sağlayan bir dengeyi kurar. Bu, genelleme kapasitesini optimize eder.
+
+Özetle:
+
+Küçük gamma (0.003 gibi) daha düz tepki verir ve genelleme yapma konusunda iyi sonuçlar verir. 🌳
+Büyük gamma (0.3 gibi) aşırı hassas olup, overfitting riskine yol açar, bu da modelin yalnızca eğitim verisine uygun hale gelmesine neden olur. 🛑
+Varsayılan gamma en dengeli yaklaşımı sunar ve genellikle iyi sonuçlar elde edilir. ⚖️
+Modelin gama değeri ne kadar büyük olursa, karar sınırları o kadar karmaşıklaşır, ancak bu genelleme kabiliyetini azaltır! 🎯
+
+📈 RBF'nin Çizimdeki Etkisi 📈
+
+Çizgi: Lineer modeldeki düz çizgi yerini, eğri bir karar sınırına bırakır.
+Ayrım: Karmaşık verilerde doğrusal olmayan ayrım yapılmasına imkan verir, böylece doğrusal olmayan verileri de başarıyla sınıflandırabilir.
+RBF Kernel, veriler arasında daha esnek ve detaylı bir ayrım yapmanızı sağlar, özellikle karmaşık ve doğrusal olmayan veri kümelerinde güçlü sonuçlar elde edilir.
+
+
+	📌 Sigmoid Kernel
+
+Sigmoid kernel, SVM (Support Vector Machine) algoritmasında doğrusal olmayan ayrım gerektiren durumlar için kullanılır ve sinir ağlarındaki aktivasyon fonksiyonu olan tanh (hiperbolik tanjant) fonksiyonuna benzer bir yaklaşım gösterir. Bu özellik, SVM'yi bir tür yapay sinir ağı gibi çalıştırmanıza olanak tanır. 🤖
+
+🤖 Sigmoid Kernel’in Özellikleri:
+
+1. Sinir Ağlarına Benzer Davranır 🧠
+
+Sigmoid kernel, sinir ağlarındaki tanh fonksiyonunu kullanarak esnek ve karmaşık karar sınırları oluşturur.
+Model, veriler arasındaki doğrusal olmayan ilişkileri öğrenir ve bunları sınıflandırır. SVM, sinir ağları gibi çalışarak daha dinamik sonuçlar elde eder! 🌐
+
+2. Doğrusal Olmayan Problemleri Çözebilir 🔄
+
+Sigmoid kernel, özellikle lojistik regresyon gibi doğrusal olmayan karar sınırları oluşturur.
+Ancak, RBF kernel kadar güçlü değildir ve daha nadiren kullanılır. RBF kernel daha gelişmiş ve güçlü karar sınırları oluşturabilir. 😎
+
+3. C ve Gamma (γ) Parametrelerinden Etkilenir ⚙️
+
+C parametresi: C büyükse, model daha katı hale gelir ve overfitting riski artar. Yani, model eğitim verisine fazla uyum sağlar. ⚠️
+Gamma (γ): Gamma büyükse, karar sınırları daha keskin ve karmaşık olur, model daha hassas hale gelir. 🔥
+
+🕰 Sigmoid Kernel Ne Zaman Kullanılır? 🕰
+
+1. Sinir Ağları Benzeri Bir Yaklaşım İsteniyorsa 🧠
+
+Eğer SVM modelinin sinir ağı gibi çalışmasını istiyorsan, sigmoid kernel en iyi tercihtir! Bu kernel, daha esnek bir yapı sunar. 🤹‍♀️
+2. Veri Doğrusal Olarak Ayrılamıyorsa Ancak Doğrusal Modele Yakınsa 📉
+
+Eğer veriler tam doğrusal olarak ayrılamıyorsa ama doğrusal sınırlara yakın bir yapıdaysa, sigmoid kernel doğrusal olmayan ancak yakın sınıflandırmalar yapmak için uygun olur! ⚖️
+3. Veriler Arasında Sigmoid Benzeri Bir İlişki Varsa 🔄
+
+Veriler arasında sigmoid benzeri  bir ilişki varsa, sigmoid kernel kullanılarak bu tür ilişkilere uygun karar sınırları oluşturulabilir! 🔀
+
+Örnek Kod (Sigmoid Kernel ile SVM):
+
+svc_model = SVC(kernel="sigmoid")
+svc_model.fit(X, y)
+plot_svm_boundary(svc_model, X, y)
+
+Bu kod parçası, sigmoid kernel kullanan bir SVM modelini oluşturur. Eğitim verileri üzerinde karar sınırlarını çizmek için plot_svm_boundary fonksiyonu kullanılır.
+
+⚖️ Sigmoid Kernel’in Çizimdeki Etkisi: ⚖️
+
+Karar Sınırı: Sigmoid kernel, doğrusal olmayan karar sınırları oluşturur. Bu sınır S şeklinde olabilir ve doğrusal olmayan verileri başarıyla ayırabilir. 🔁
+
+Ayrım: Sigmoid kernel, veriler arasındaki doğrusal olmayan ilişkileri daha iyi modelleyebilir. Bu sayede, karmaşık veri kümelerinde esnek ve doğru ayrımlar yapılabilir. 🌐
+
+Özetle:
+
+Sigmoid kernel, doğrusal olmayan ayrım gerektiren durumlarda kullanılır ve sinir ağları gibi çalışarak esnek karar sınırları oluşturur.
+C ve gamma parametreleri, modelin esnekliğini ve karar sınırlarının karmaşıklığını etkiler.
+Sigmoid kernel, özellikle sinir ağı benzeri bir yapı isteniyorsa, veriler doğrusal olarak ayrılamıyorsa ve sigmoid benzeri ilişkiler varsa kullanılabilir. 🚀
+
+🌐 
+
+# Sigmoid Kernel ile SVM Modeli (C ve Gamma parametreleri ile)
+svc_model = SVC(kernel="sigmoid", C=1.0, gamma=0.5)  # Burada C ve gamma değerlerini belirliyoruz
+svc_model.fit(X, y)
+
+🌐
+
+
+⚪ C Parametresi: ⚪
+
+C değeri, modelin ne kadar katı veya esnek olacağını belirler.
+C büyükse, model daha katı olur ve overfitting riski artar. Yani, model eğitim verisine daha fazla uyum sağlar. 🔥
+C küçükse, model daha genel ve esnek olur, ama underfitting riski de artabilir. 🌳
+
+⚪ Gamma Parametresi (γ): ⚪
+
+Gamma, kernel'in etki alanını belirler. Yani, gamma değeri ne kadar büyükse, modelin karar sınırları o kadar keskin ve karmaşık olur. Bu da overfitting riskini artırır. 🔥
+Gamma küçükse, karar sınırları daha düz olur ve model daha genel bir yaklaşım sergiler, bu da underfitting riski yaratabilir. 🌄
+
+⚪ Sigmoid Kernel'de C ve Gamma'nın Rolü: ⚪
+
+C parametresi, sigmoid kernel'in karar sınırlarının katılığını kontrol eder.
+Gamma parametresi ise sigmoid kernel'in karar sınırlarının keskinliğini ve karmaşıklığını belirler.
+
+Özetle:
+
+Sigmoid kernel de C ve gamma parametrelerini alır ve bu parametreler, modelin nasıl davranacağını etkiler. C ve gamma değerlerini doğru seçmek, modelin performansı ve overfitting/underfitting dengesini kurmak açısından kritik rol oynar.
+
+
+	📌 Poly Kernel (Polinom Kernel) 📌
+
+Polinom kernel, SVM (Support Vector Machine) algoritmasında, doğrusal olmayan veri kümelerini sınıflandırmak için kullanılan bir kernel türüdür. Bu kernel, polinom fonksiyonları kullanarak, doğrusal olarak ayrılamayan verilerin doğrusal olmayan ayrımlarını yapmanıza olanak tanır.
+
+🧑‍💻 Poly Kernel’in Özellikleri: 🧑‍💻
+
+Polinom Fonksiyonları Kullanır:
+
+Poly kernel, polinom fonksiyonları kullanarak verileri sınıflandırır. Bu sayede doğrusal olmayan sınıflandırmalarda doğrusal olmayan karar sınırları oluşturulabilir.
+ 
+Burada x ve y, iki veri örneği, c bir sabit terim, d ise polinomun derecesidir.
+Derece (Degree) Parametresi:
+
+Degree (derece) parametresi, polinom kernel'inin derecesini belirler. Degree büyüdükçe, karar sınırları daha karmaşık ve esnek olur.
+
+Örneğin, degree=2 seçildiğinde, model ikinci dereceden bir polinom kullanarak karar sınırlarını oluşturur. Bu, veri setindeki daha karmaşık ilişkileri öğrenebilmesine olanak sağlar.
+
+⚪ C ve Gamma Parametrelerinden Etkilenir: ⚪
+
+C: C parametresi, modelin katılığını belirler. Yüksek C değeri, modelin eğitim verilerine daha fazla uyum sağlamasına neden olur ve overfitting riski oluşturabilir.
+Gamma (γ): Gamma değeri, kernel’in etki alanını belirler. Küçük gamma daha düz karar sınırları oluşturur, büyük gamma ise daha keskin ve hassas karar sınırları oluşturur.
+
+📊 Poly Kernel Örneği: 📊
+
+Aşağıdaki örnekte, polynomial kernel kullanarak bir SVM modeli oluşturuyoruz ve modelin karar sınırlarını çiziyoruz:
+
+# Polynomial Kernel ile SVM Modeli (degree parametresi ile)
+svm_model = SVC(kernel="poly", degree=2, C=1.0, gamma='scale')  # degree, C ve gamma parametrelerini belirliyoruz
+svm_model.fit(X, y)
+
+# Eğitim verileri üzerinde karar sınırlarını çiziyoruz
+plot_svm_boundary(svm_model, X, y)
+
+🔍 Poly Kernel’in Etkisi:
+
+Degree=2: İkinci dereceden bir polinom kullanarak karar sınırlarını oluşturur. Bu, modelin verileri daha karmaşık bir şekilde ayırmasını sağlar. Ancak, degree değeri arttıkça model daha karmaşık hale gelir ve overfitting riski artabilir.
+
+C ve Gamma: C ve gamma parametreleri, modelin esnekliğini ve karmaşıklığını kontrol eder.
+
+🏁 Ne Zaman Kullanılır? 🏁
+
+Doğrusal Olmayan Sınıflandırmalar: Veri setinde doğrusal olmayan ilişkiler varsa, polynomial kernel çok iyi çalışabilir.
+
+Karmaşık Karar Sınırları Gerektiren Durumlar: Eğer veri setindeki sınıflar birbirinden doğrusal olarak ayrılamıyorsa ve daha karmaşık bir karar sınırı oluşturmak istiyorsanız, polinom kernel kullanmak faydalıdır.
+
+📉 Poly Kernel’in Riskleri: 📉
+
+Overfitting Riski: Derece arttıkça, model daha esnek hale gelir ve overfitting riski artar. Model, eğitim verisine çok fazla uyum sağlayarak yeni verilere genelleme yapamayabilir.
+
+
+				📌 5. Grid Search ile En İyi Modeli Bulma
+
+from sklearn.model_selection import GridSearchCV
+
+svm = SVC()
+
+C = 10.0 ** np.arange(-4,3)# 10^-4 - 10^2
+
+# Başlangıcı alır sondakinin 1 eksiğine kadar gider
+# Hata almamak için 10./10.0  tarzında yazmalısın
+
+
+parameters={
+    "C":C,
+    "kernel":["rbf","linear"]
+    }
+    
+grid = GridSearchCV(svm,parameters )
+grid.fit(X,y)
+grid.best_score_
+grid.best_params_
+
+
+📌 Grid Search İşlemi Açıklaması:
+
+📊 C Parametresi için Aralık Belirleme: 📊
+
+C = 10.0 ** np.arange(-4, 3)  # 10^-4 ile 10^2 arasındaki değerler
+
+C parametresi, modelin esnekliğini belirler. Küçük C değerleri modelin genelleme yapmasını sağlar, büyük C değerleri ise modelin eğitim verisine çok fazla uymasına neden olabilir (overfitting). 😬
+Burada C için farklı değerler oluşturuluyor: 
+10^-4, 10^-3, 10^-2, 10^-1, 1, 10, 100, 1000. 🚀
+
+📚 Parametreler Sözlüğü: 📚
+
+parameters = {
+    "C": C,
+    "kernel": ["rbf", "linear"]
+}
+
+C parametresi yukarıda oluşturduğumuz değerlerle tanımlanıyor. 🧑‍💻
+kernel parametresi, SVM'in hangi çekirdek fonksiyonlarını kullanacağını belirliyor. Burada "rbf" (Radial Basis Function) ve "linear" (doğrusal) kernel’ler deneniyor. 🧠
+
+⚙️ GridSearchCV Modelini Tanımlama ve Eğitme: ⚙️
+
+grid = GridSearchCV(svm, parameters)
+grid.fit(X, y)
+
+GridSearchCV burada, belirtilen parametre kombinasyonları üzerinde modelin eğitim sürecini başlatıyor. 🔄
+
+Her bir C ve kernel kombinasyonu denendikten sonra, en iyi sonuçlar (yani en iyi performans) elde ediliyor. 🔥
+
+🏆 En İyi Sonuçları Alma: 🏆
+
+grid.best_score_
+grid.best_params_
+
+grid.best_score_: Bu, en iyi parametre kombinasyonu ile elde edilen en yüksek doğruluk değerini döndürüyor. 🎯
+grid.best_params_: En iyi sonucu veren C ve kernel kombinasyonlarını döndürüyor. 🎉
+
+Özet: 📈
+
+GridSearchCV ile, modelin hiperparametrelerini test ediyoruz: C ve kernel değerleri için tüm kombinasyonları deniyoruz. 🔍
+Modelin hangi parametrelerle en iyi performansı gösterdiğini buluyoruz. 🚀
+Bu süreç, modelin daha iyi genelleme yapabilmesi için oldukça önemli! 💡
+Hedefimiz: Modelin performansını optimize etmek ve en iyi parametreleri bulmak! ✨
+
+
+				📌 7. Final Model ve Değerlendirme
+
+GridSearch ile yapılan işlemlerin sonucunda aşağıda olduğu gibi bir değer skalası çıkmıştır.
+
+🚀{'C': np.float64(0.0001), 'kernel': 'rbf'} 🚀
+
+Bunu final modeline uyarlayalım
+
+svm = SVC(kernel="rbf" , C=0.0001)
+svm.fit(X,y)
+plot_svm_boundary(svm_model, X,y)
+svm_pred =svm.predict(X)
+
+from sklearn.metrics import ConfusionMatrixDisplay ,classification_report
+
+ConfusionMatrixDisplay.from_estimator(svm,X,y)
+print(classification_report(y,svm_pred))
+
+* Kullanılacak kernellar ve C değerlerinin etkileri yukarıda gözüktüğü gibidir.
+
+* GridSearch kullanarak yapılan işlemlerde hangisinin en iyi sonuç verileceği bulunmuş ve denenmiştir.
+
+* İsterseniz yukarıda kendimizin denediği değerler ile görselleştirme yaparak daha detaylı farkları görebilirsiniz
+
+
+  📊🔍 GridSearchCV sonucunda elde edilen en iyi parametreleri ve skorları tablo ve grafik olarak gösteren bir fonksiyonu açıklayalım. 📊🔍
+
+
+				📌 Grid_Plot.py 📌
+
+
+📌 1. Fonksiyonun Amacı
+
+def GridSearch_table_plot(grid_clf, param_name, num_results=15, negative=True, graph=True, display_all_params=True):
+
+GridSearchCV'nin sonuçlarını daha iyi anlamak için tablolar ve grafikler oluşturan bir yardımcı fonksiyon.
+
+param_name: Hangi hiperparametrenin incelendiğini belirtiyor. 🔢
+
+num_results: Kaç sonucu göstereceğimizi belirtiyor. 📜
+
+negative: Skor negatifse ters çeviriyor (örneğin neg_log_loss gibi metriklerde). 🔄
+graph: Grafik çizilsin mi? 🎨
+
+display_all_params: Tüm parametreleri gösterelim mi? 🧐
+
+📌 2. En İyi Parametreleri ve Skoru Bulma
+
+clf = grid_clf.best_estimator_
+clf_params = grid_clf.best_params_
+if negative:
+    clf_score = -grid_clf.best_score_
+else:
+    clf_score = grid_clf.best_score_
+clf_stdev = grid_clf.cv_results_['std_test_score'][grid_clf.best_index_]
+cv_results = grid_clf.cv_results_
+En iyi modeli (best_estimator_) alıyoruz. 🏆
+En iyi hiperparametreleri (best_params_) çıkarıyoruz. 🛠️
+En iyi skoru alıp negatifse ters çeviriyoruz. 🔢
+Standart sapmayı (std_test_score) alıyoruz. 📊
+
+📌 3. Sonuçları Yazdırma
+
+print("best parameters: {}".format(clf_params))
+print("best score:      {:0.5f} (+/-{:0.5f})".format(clf_score, clf_stdev))
+if display_all_params:
+    import pprint
+    pprint.pprint(clf.get_params())
+En iyi parametreleri ve skoru ekrana yazdırıyoruz. 🖥️
+Tüm parametreleri görmek istiyorsak pprint.pprint() ile bastırıyoruz. 📄
+
+📌 4. En İyi Sonuçları Seçme
+
+scores_df = pd.DataFrame(cv_results).sort_values(by='rank_test_score')
+best_row = scores_df.iloc[0, :]
+if negative:
+    best_mean = -best_row['mean_test_score']
+else:
+    best_mean = best_row['mean_test_score']
+best_stdev = best_row['std_test_score']
+best_param = best_row['param_' + param_name]
+Sonuçları rank_test_score'a göre sıralıyoruz (en iyi sonuç en üstte olacak). 📈
+En iyi sonucu (best_row) alıyoruz. 🥇
+En iyi skorun ortalama ve standart sapmasını buluyoruz. 📊
+İlgili parametrenin en iyi değerini (best_param) alıyoruz. 🎯
+
+📌 5. İlk num_results Kadar Sonucu Gösterme
+
+display(pd.DataFrame(cv_results).sort_values(by='rank_test_score').head(num_results))
+En iyi num_results kadar sonucu tablo halinde gösteriyoruz. 🏆
+
+📌 6. Sonuçları Grafikte Gösterme
+
+scores_df = scores_df.sort_values(by='param_' + param_name)
+if negative:
+    means = -scores_df['mean_test_score']
+else:
+    means = scores_df['mean_test_score']
+stds = scores_df['std_test_score']
+params = scores_df['param_' + param_name]
+İlgili hiperparametreye göre sıralıyoruz. 📏
+Skorları alıp negatifse ters çeviriyoruz. 🔄
+Standart sapma ve hiperparametre değerlerini çıkarıyoruz. 📊
+
+📌 7. Grafiği Çizme
+
+if graph:
+    plt.figure(figsize=(8, 8))
+    plt.errorbar(params, means, yerr=stds)
+
+    plt.axhline(y=best_mean + best_stdev, color='red')
+    plt.axhline(y=best_mean - best_stdev, color='red')
+    plt.plot(best_param, best_mean, 'or')
+
+    plt.title(param_name + " vs Score\nBest Score {:0.5f}".format(clf_score))
+    plt.xlabel(param_name)
+    plt.ylabel('Score')
+
+    plt.xscale('log')
+
+    plt.show()
+
+Eğer graph=True ise grafiği çiziyoruz. 🎨
+
+X eksenine hiperparametre değerlerini, Y eksenine skoru koyuyoruz. 📈
+Hata çubukları (errorbar) ile standart sapmayı gösteriyoruz. 📏
+
+En iyi skoru kırmızı noktalar ve çizgilerle vurguluyoruz. 🚀
+
+X eksenini logaritmik ölçeğe çeviriyoruz (plt.xscale('log')) çünkü hiperparametreler genellikle üstel olarak değişir. 🔢
+
+📌 Özet
+
+Bu fonksiyon GridSearchCV'nin sonuçlarını daha iyi analiz etmemizi sağlar:
+✅ En iyi hiperparametreleri ve skoru bulur 🎯
+✅ Sonuçları tablo olarak gösterir 📊
+✅ Grafik ile performans değişimini görselleştirir 📈
+
+Bu fonksiyon hiperparametre optimizasyonunun nasıl çalıştığını anlamak için mükemmel bir araçtır! 🚀
+
+
+
+				📌 Svm_margin_plotpy 📌
+
+Bu fonksiyon, SVM (Support Vector Machine) modelinin karar sınırlarını ve destek vektörlerini görselleştirir. 📊🤖
+
+📌 1. Fonksiyonun Amacı
+
+def plot_svm_boundary(model, X, y):
+
+Eğitilmiş bir SVM modelinin karar sınırlarını çizmek için kullanılır.
+Destek vektörlerini vurgular.
+İki boyutlu verilerle çalışır, dolayısıyla sadece iki özelliği (X[:,0] ve X[:,1]) olan verilerde kullanılabilir.
+
+📌 2. Veriyi Hazırlama
+
+X = X.values
+y = y.values
+
+Pandas DataFrame yerine NumPy dizisi olarak işlem yapabilmek için .values kullanıyoruz. 🔄
+
+📌 3. Veri Noktalarını Grafiğe Dökmek
+
+plt.scatter(X[:, 0], X[:, 1], c=y, s=30, cmap='rainbow')
+Eğitim verilerini bir scatter plot ile gösteriyoruz. 📍
+Renkler (c=y) sınıflara göre belirleniyor. 🌈
+
+📌 4. Grafik İçin Sınırları Belirleme
+
+ax = plt.gca()
+xlim = ax.get_xlim()
+ylim = ax.get_ylim()
+Mevcut eksen (ax = plt.gca()) üzerinden X ve Y sınırlarını alıyoruz. 🔳
+
+📌 5. Modelin Karar Sınırını Çizmek İçin Izgara Oluşturma
+
+xx = np.linspace(xlim[0], xlim[1], 30)
+yy = np.linspace(ylim[0], ylim[1], 30)
+YY, XX = np.meshgrid(yy, xx)
+xy = np.vstack([XX.ravel(), YY.ravel()]).T
+
+X ve Y eksenlerinde 30 noktadan oluşan bir grid (ızgara) oluşturuyoruz. 🏗️
+Bu gridin her noktası için modelin karar fonksiyonunu hesaplayacağız.
+
+📌 6. Karar Fonksiyonunu Kullanarak Sınırları Belirleme
+python
+Kopyala
+Düzenle
+Z = model.decision_function(xy).reshape(XX.shape)
+SVM'nin karar fonksiyonunu (decision_function) kullanarak grid noktalarının hangi sınıfa ait olduğunu hesaplıyoruz.
+Sonuçları (Z) tekrar XX.shape boyutuna getiriyoruz.
+
+📌 7. Karar Sınırlarını Çizme
+
+ax.contour(XX, YY, Z, colors='k', levels=[-1, 0, 1], alpha=0.5,
+           linestyles=['--', '-', '--'])
+
+contour() fonksiyonu ile karar sınırlarını çiziyoruz.
+Seviyeler (levels=[-1, 0, 1]):
+0 çizgisi karar sınırını gösterir. ⚖️
+-1 ve 1 çizgileri margin çizgileridir. 🚧
+
+📌 8. Destek Vektörlerini Gösterme
+
+ax.scatter(model.support_vectors_[:, 0], model.support_vectors_[:, 1], s=100,
+           linewidth=1, facecolors='none', edgecolors='k')
+
+SVM'nin belirlediği destek vektörlerini çember içine alıyoruz. ⭕
+Destek vektörleri modelin karar sınırını belirlemede en etkili olan noktalardır. 🔑
+
+📌 Özet
+Bu fonksiyon, SVM modelinin nasıl çalıştığını anlamak için çok kullanışlıdır:
+✅ Karar sınırını çizer ➡️ 📏
+✅ Margin çizgilerini gösterir ➡️ 🚧
+✅ Destek vektörlerini vurgular ➡️ ⭕
+✅ Sınıfları renklerle ayırır ➡️ 🌈
+
+SVM modelinizi eğittikten sonra bu fonksiyon ile görselleştirme yaparak karar sınırlarını analiz edebilirsiniz! 🚀
+
+
+
+
+
+
+
+
+
+
+
+
+

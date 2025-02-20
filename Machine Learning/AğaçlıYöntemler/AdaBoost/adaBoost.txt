@@ -1,0 +1,495 @@
+📊 AdaBoost Nedir?
+AdaBoost (Adaptive Boosting), zayıf sınıflandırıcıları (model parçalarını) bir araya getirerek güçlü bir sınıflandırıcı oluşturmayı amaçlayan bir algoritmadır.
+
+💡 Ne İşe Yarar?
+AdaBoost, farklı sınıflandırıcıları birleştirerek daha doğru sonuçlar elde etmek için kullanılır. Her bir modelin hata payını göz önünde bulundurarak, yanlış sınıflandırılan örneklere daha fazla ağırlık verir ve böylece doğruluğu artırır.
+
+🔄 Diğer Ağaç Modellerinden Farkı Nedir?
+Zayıf Öğreniciler: AdaBoost, her defasında zayıf bir model oluşturur (örneğin karar ağaçları), ancak her yeni model, önceki modellerin hatalarını düzeltmeye odaklanır.
+Ağaçlar Arası İlişki: Diğer ağaç modelleri genellikle bağımsızdır (örneğin, rastgele orman), AdaBoost'ta ise ağaçlar birbiriyle etkileşim içinde olup ardışık çalışır.
+
+🚀 Neden Oluşturulmuştur?
+AdaBoost, zayıf modelleri güçlendirmek ve daha doğru tahminler yapmak için geliştirilmiştir. Hedefi, tek başına yetersiz kalan basit modelleri birleştirerek güçlü bir sınıflandırıcı oluşturmaktır.
+
+🔑 Ana Özellikler
+Ağırlıklı Öğrenme: Model, yanlış sınıflandırılan örnekleri daha fazla dikkate alır.
+Hızlı ve Etkili: Zayıf modellerin gücünden faydalanarak daha verimli sonuçlar alır.
+Esneklik: Çeşitli sınıflandırıcılarla kullanılabilir.
+Yani, AdaBoost aslında "zayıf modellerin birleşimiyle güçlü bir model oluşturma" fikrini savunur! 🌟
+
+				 💡 ADA BOOST 💡
+
+1️⃣ Veri Hazırlama
+2️⃣ Veri Görselleştirme
+3️⃣ Model Eğitimi ve Değerlendirme
+4️⃣ Model İyileştirme ve Hata Analizi
+5️⃣ Final Model ve Sonuçlar
+
+				🛠️ Veri Hazırlama 🛠️
+
+Veri hazırlama, modelleme sürecinin en önemli aşamalarından biridir. Bu adımda, veriyi anlamak, eksiklikleri tespit etmek ve veriyi uygun formata getirmek için çeşitli işlemler yapılır.
+
+📊 Gerekli kütüphanelerin yüklenmesi 📊
+
+İlk olarak, gerekli kütüphaneler (numpy, pandas, seaborn, matplotlib) import edilir. Bu kütüphaneler veri analizi ve görselleştirme için kullanılır.
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+🍄 Veri kümesinin yüklenmesi 🍄
+
+df = pd.read_csv("mushrooms.csv")
+
+Veri kümesi, pandas kütüphanesinin read_csv fonksiyonu ile yüklenir. Bu veri kümesi, mantar türleri hakkında bilgileri içermektedir.
+
+📝 Veri çerçevesinin genel yapısının incelenmesi 📝
+
+df.info()
+
+df.info() komutu, veri çerçevesinin genel yapısını gösterir. Veri tipi, eksik veriler ve sütun sayısı gibi bilgileri sağlar.
+
+❌ Eksik verilerin kontrol edilmesi ❌
+
+df.isna().sum().sum()
+
+Eksik (NaN) verileri kontrol etmek için isna().sum() fonksiyonu kullanılır. Eğer veri setinde eksik değerler varsa, bunlar sum() ile toplu şekilde hesaplanabilir.
+
+🔄 Veri özetinin çıkarılması 🔄
+
+df.describe().transpose()
+
+Veri setindeki sayısal değişkenler hakkında özet istatistikleri görmek için describe() fonksiyonu kullanılır. transpose() ile bu bilgilerin düzenini değiştirerek daha okunabilir hale getirebiliriz.
+
+🧮Benzersiz değerlerin sıralanması 🧮
+
+df.describe().T.sort_values(by="unique")
+
+Benzersiz (unique) değerleri daha iyi anlamak için bu komut kullanılır. Veriyi benzersiz değerlere göre sıralar.
+
+🔍 Veri satırlarının incelenmesi 🔍
+
+df.iloc[3]
+
+Veri çerçevesindeki 3. satırı görmek için kullanılır. Bu, veriyi daha yakından incelememize yardımcı olur.
+
+📑 Eşsiz değerlerin ve sayılarının gösterilmesi 📑
+
+pd.concat({"Eşsiz değer": df.apply(pd.unique), "sayısı": df.nunique()}, axis=1)
+
+apply(pd.unique) her sütundaki eşsiz değerleri, nunique() ise her sütundaki benzersiz değerlerin sayısını verir. Bu sayılar, veri setini daha iyi analiz etmek için kullanılır.
+
+⚖️ Sınıf dağılımının kontrol edilmesi ⚖️
+
+df["class"].value_counts()
+
+class sütunundaki sınıfların dağılımını görmek için value_counts() fonksiyonu kullanılır. Bu, verinin dengesiz olup olmadığını anlamamıza yardımcı olabilir.
+
+
+				📊 Görselleştirme 📊
+
+Veri setinin daha iyi anlaşılabilmesi ve analize daha kolay erişebilmek için çeşitli görselleştirme teknikleri kullanılır. Bu adımda, verileri görsel hale getirerek anlamak çok daha kolay hale gelir.
+
+🧮 Eşsiz Değerlerin Görselleştirilmesi 🧮
+
+İlk görselleştirmede, her bir sütundaki benzersiz değerlerin sayısını görselleştiren bir çubuk grafik oluşturulur. Bu, veri setindeki kategorik değişkenlerin çeşitliliğini anlamamıza yardımcı olur.
+
+sns.barplot(data=df.describe().transpose().reset_index().sort_values("unique"), x="index", y="unique")
+plt.xticks(rotation=90)
+
+sns.barplot() Seaborn kütüphanesinin çubuk grafik çizme fonksiyonudur. Burada, index ve unique sütunları kullanılarak her sütundaki benzersiz değerlerin sayısı çubuk grafik ile gösterilir.
+
+df.describe() fonksiyonu, DataFrame'in sayısal özetini verir.
+
+.transpose() ile bu özetin satır ve sütunları tersine çevrilir ve daha anlaşılır hale gelir.
+
+.reset_index() mevcut index'i bir sütun olarak döndürür ve daha kolay sıralama yapılmasını sağlar.
+
+.sort_values("unique") ile veri benzersiz değerlerin sayısına göre sıralanır.
+
+plt.xticks(rotation=90) X eksenindeki etiketlerin okunabilirliğini arttırmak için döndürülür.
+
+Sonuç olarak, her sütundaki benzersiz değer sayısını gösteren bir çubuk grafik elde edilir. 📊
+
+⚖️ Class Değişkeninin Dağılımı ⚖️
+
+İkinci görselleştirmede ise, class sütunundaki değerlerin dağılımı görselleştirilir. Bu tür bir grafik, sınıflar arasında dengesiz bir dağılım olup olmadığını anlamaya yardımcı olur.
+
+sns.countplot(data=df, x="class")
+sns.countplot() fonksiyonu, belirtilen sütundaki her bir değerin kaç kere tekrar ettiğini gösteren bir sayım grafiği oluşturur.
+
+Burada, class sütunundaki her bir sınıfın sayısı görselleştirilir.
+Bu, verinin sınıflar arasında dengesiz olup olmadığını anlamamıza olanak sağlar. Özellikle sınıflar arasında büyük farklar varsa, modelleme aşamasında bu dengeyi dikkate almak gerekebilir. ⚖️
+
+
+
+				🔄 Train-Test Split 🔄
+
+Modelleme sürecinde, verinin eğitim (train) ve test (test) setlerine ayrılması, modelin genelleme yeteneğini test etmek için kritik öneme sahiptir. Bu adımda, veriyi eğitim ve test setlerine ayırarak modelin performansını daha doğru bir şekilde değerlendirebiliriz.
+
+🎯 Özelliklerin ve hedef değişkenin ayrılması 🎯
+
+x = df.drop("class", axis=1)
+y = df["class"]
+
+Veri kümesindeki özellikler (x) ve hedef değişken (y) ayrılır. class sütunu hedef değişken olarak kabul edilir, diğer tüm sütunlar ise özellikler olarak kullanılır.
+
+🔢Kategorik verilerin sayısal verilere dönüştürülmesi 🔢
+
+x = pd.get_dummies(x, drop_first=True)
+x.columns
+
+Kategorik değişkenler, modelin anlayabileceği sayısal verilere dönüştürülmelidir. Bunun için get_dummies() fonksiyonu kullanılır. drop_first=True parametresi, her kategori için bir sütun ekleyip birini çıkarır ve multicollinearity (çoklu doğrusal ilişki) sorununu engeller.
+
+📊 Veri setinin eğitim ve test olarak ayrılması 📊
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=9)
+
+train_test_split() fonksiyonu ile veri seti eğitim ve test setlerine ayrılır. Burada test_size=0.1 ile verilerin %10'u test için, geri kalan %90'ı ise eğitim için ayrılır. random_state=9 parametresi, işlemin her seferinde aynı sonuçları vermesini sağlar.
+
+
+			🤖 Model Eğitimi ve Değerlendirme 🤖
+
+Veri hazırlama ve görselleştirme aşamalarından sonra, modelin eğitilmesi ve test edilmesi sürecine geçilir. Bu adımda, model eğitim verisiyle öğrenir ve test verileriyle performansı değerlendirilir.
+
+📚 AdaBoost Modelinin Eğitilmesi 📚
+
+AdaBoost, zayıf sınıflandırıcıları birleştirerek güçlü bir sınıflandırıcı oluşturmayı sağlayan bir topluluk öğrenme algoritmasıdır. İlk olarak, AdaBoost sınıfını çağırıp eğitim için hazır hale getireceğiz.
+
+from sklearn.ensemble import AdaBoostClassifier
+model = AdaBoostClassifier(n_estimators=3)
+
+n_estimators=3 parametresi, modelde kullanılacak zayıf sınıflandırıcı sayısını belirler (bu örnekte 3 adet).
+
+🎓 Modelin Eğitilmesi 🎓
+
+Modeli eğitmek için, eğitim verilerini kullanarak fit() fonksiyonu ile modelin parametrelerini optimize ederiz.
+
+model.fit(X_train, y_train)
+
+🔮 Test Verisi ile Tahmin Yapma 🔮
+Eğitilen model, test verileri üzerinde tahminlerde bulunarak performansını ölçeriz.
+
+mantar_pred = model.predict(X_test)
+
+
+				🧑‍💻 Model Değerlendirme 🧑‍💻
+
+🔢 Confusion Matrix 🔢
+
+Confusion Matrix, modelin doğruluğunu ve yanlış sınıflandırmalarını görsel olarak anlamamıza yardımcı olur. Bu matriste, doğru tahminler ve yanlış sınıflandırmalar gösterilir.
+
+from sklearn.metrics import ConfusionMatrixDisplay
+
+İlk olarak ConfusionMatrixDisplay.from_estimator() fonksiyonu ile confusion matrix görseli oluşturulur. Normal olmayan (raw) ve normalize edilmiş (true) sonuçlar görselleştirilir.
+
+ConfusionMatrixDisplay.from_estimator(model, X_test, y_test)
+ConfusionMatrixDisplay.from_estimator(model, X_test, y_test, normalize="true")
+
+İlk komut, orijinal confusion matrix'i gösterirken, ikinci komut normalize edilmiş formda confusion matrix'i sunar. Normalize edilmiş matrix, doğruluğun yüzdelik dilimlerdeki dağılımını gösterir.
+
+📊 Classification Report 📊
+
+classification_report() fonksiyonu, modelin her sınıf için doğruluk (accuracy), geri çağırma (recall), kesinlik (precision) ve F1 skorlarını gösterir. Bu metrikler, modelin her sınıf üzerindeki performansını anlamamıza yardımcı olur.
+
+print(classification_report(y_test, mantar_pred))
+
+classification_report() fonksiyonu, test verisi üzerinde yapılan tahminleri ve gerçek sonuçları karşılaştırarak modelin her sınıf için performansını gösterir. Yüksek precision ve recall değerleri, modelin doğru tahminlerde bulunduğunu gösterir.
+
+
+			📊 En İyi Değeri Bulmak 📊
+
+Modelin performansını optimize etmek için farklı parametrelerle denemeler yapılabilir. Bu adımda, modelin n_estimators parametresi üzerinde değişiklikler yaparak en uygun değeri bulmaya çalışıyoruz.
+
+🔢 Hata Oranı Hesaplama 🔢
+
+n_estimators parametresi, modelin oluşturacağı zayıf sınıflandırıcı sayısını belirtir. Bu değeri 1 ile 30 arasında değiştirerek, her bir n_estimators değeri için modelin başarımını ölçeriz.
+
+hata_oranı =[]
+for mantar_est in range(1,30):
+    model = AdaBoostClassifier(n_estimators=mantar_est)
+    model.fit(X_train, y_train)
+    model_deneme_pred = model.predict(X_test)
+    hata = 1 - accuracy_score(y_test, model_deneme_pred)
+    hata_oranı.append(hata)
+
+Bu döngüde, her n_estimators değeri için model eğitilir, tahmin yapılır ve hata oranı hesaplanır.
+En düşük hata oranı, en iyi modelin seçilmesine yardımcı olacaktır.
+
+💡 Veri Kümesini Örneklem Seçerek Küçültme 💡
+
+Veri kümesi çok büyükse ve modelin eğitimi zaman alıyorsa, rastgele örnekleme yaparak veri kümesini küçültmek işlemi daha verimli hale getirebilir. Bu adımda, veri kümesinin %5'ini rastgele seçiyoruz.
+
+df_sample = df.sample(frac=0.05, random_state=9)
+frac=0.05: Veri kümesinin %5'ini seçer.
+random_state=9: Rastgele seçim işlemini sabitler, böylece her çalıştırmada aynı sonuçları alırız.
+Bu işlem, büyük veri kümesinde daha hızlı model eğitimi yapmamıza olanak sağlar.
+
+🔍 Seçilen Örnek Veri Kümesinin Bilgileri 🔍
+
+Seçilen küçük örnek veri kümesinin genel bilgilerini görmek için info() fonksiyonunu kullanıyoruz.
+
+df_sample.info()
+Bu komut, örnek veri kümesinin yapısını ve her sütundaki veri tiplerini gösterir.
+Bu adımlar, modelin daha verimli eğitilmesi ve en uygun parametrelerin bulunmasına yardımcı olur.
+
+
+		📊 Özelliklerin Önemliliği ve Görselleştirilmesi 📊
+
+Modelin eğitilmesinin ardından, her bir özelliğin modelin kararına ne kadar katkı sağladığını görmek önemlidir. AdaBoost sınıflandırıcısı, özelliklerin önem derecelerini belirleyebilir. Bu adımda, her bir özelliğin modeldeki ağırlığını inceleyeceğiz.
+
+🔢 Özelliklerin Ağırlıklarını Hesaplama 🔢
+
+AdaBoost, modelde kullanılan her özelliğin (feature) önem derecesini feature_importances_ parametresi ile hesaplar. Bu, hangi özelliklerin daha fazla etkili olduğunu anlamamıza yardımcı olur.
+
+model.feature_importances_
+
+AdaBoost sınıflandırıcısı, bazı özelliklerin önemini sıfırlayarak, modelin daha verimli çalışmasını sağlar. Bu, modelin yalnızca önemli özelliklere odaklanmasını sağlar.
+
+📉 Özelliklerin Önem Derecelerini Gösterme 📉
+
+Bu adımda, özelliklerin katsayılarını bir DataFrame'e alıp, yalnızca pozitif katsayıları gösteriyoruz. Bu sayede önemli özellikleri daha iyi analiz edebiliriz.
+
+feature_df = pd.DataFrame(index=x.columns, columns=["Katsayı"], data=model.feature_importances_)
+
+Bu, her bir özelliğin modeldeki önem derecesini bir "Katsayı" olarak tutar. Daha sonra, sıfırdan büyük olanları filtreliyoruz.
+
+🔍 Özellikleri Sıralama 🔍
+
+Özelliklerin katsayılarını büyüklük sırasına göre sıralıyoruz. Bu, hangi özelliklerin modelde daha fazla etkiye sahip olduğunu anlamamıza yardımcı olur.
+
+feature_df = feature_df[feature_df["Katsayı"] > 0]
+feature_df = feature_df.sort_values("Katsayı")
+
+Burada, yalnızca önemli olan özellikleri gösteriyoruz ve bu özellikleri sıralayarak hangi özelliklerin modelde daha fazla rol oynadığını net bir şekilde görebiliriz.
+
+📊 Özelliklerin Görselleştirilmesi 📊
+
+Özelliklerin önem derecelerini görselleştirmek, hangi özelliklerin model için kritik olduğunu daha kolay anlamamıza olanak tanır.
+
+sns.barplot(x=feature_df.index, y="Katsayı", data=feature_df)
+plt.xticks(rotation=90)
+Bu barplot, her bir özelliğin modeldeki önem derecesini görsel olarak gösterir. Özelliklerin isimleri x ekseninde, önem dereceleri ise y ekseninde yer alır.
+
+🔬 Kategorik Özelliklerin Dağılımını Görselleştirme 🔬
+
+Kategorik özelliklerin sınıflara göre dağılımını incelemek, verinin dengesini görmek için faydalıdır. Bu adımda, odor ve spore-print-color gibi kategorik değişkenlerin sınıflara göre dağılımını görselleştiriyoruz.
+
+sns.countplot(x="odor", hue="class", data=df)
+sns.countplot(x="spore-print-color", hue="class", data=df)
+Bu görseller, "odor" ve "spore-print-color" özelliklerinin farklı sınıflar arasındaki dağılımlarını gösterecektir.
+
+
+		🚀 Final Modelin Eğitilmesi ve Değerlendirilmesi 🚀
+	
+Modelin son halini almak için parametreleri en iyi şekilde ayarladıktan sonra, final modelini eğitiyoruz. AdaBoostClassifier ile en uygun n_estimators değeri olarak 18'i seçtik. Bu, modelin başarımını en iyi şekilde yansıtan değeri sağladı.
+
+🔧 Final Modelin Eğitilmesi 🔧
+
+En son modelin eğitimini, en uygun parametrelerle yapıyoruz. Bu adımda, AdaBoostClassifier sınıfından bir model oluşturup, eğitim verileri ile modelimizi eğitiyoruz.
+
+final_model = AdaBoostClassifier(n_estimators=18)
+final_model.fit(X_train, y_train)
+
+Model, 18 zayıf sınıflandırıcı (n_estimators=18) ile eğitim aldı. Bu, modelin kararlarını oluştururken kullanacağı zayıf sınıflandırıcı sayısını belirler.
+
+🔮 Test Verisi Üzerinden Tahmin Yapmak 🔮
+
+Eğitilen final modelini test verisi üzerinde kullanarak tahminler yapıyoruz. Bu adımda, modelin performansını görmek amacıyla tahminler elde ediyoruz.
+
+
+final_pred = final_model.predict(X_test)
+
+Bu komut, test verisi üzerinden modelin tahminlerini elde eder ve her bir test örneği için hangi sınıfa ait olduğunu tahmin eder.
+
+📊 Confusion Matrix Görselleştirilmesi 📊
+
+Modelin başarımını daha ayrıntılı görmek için Confusion Matrix kullanıyoruz. Bu, modelin doğru ve yanlış sınıflandırmalarını gösterir. Normalize edilmemiş ve normalize edilmiş hallerini görselleştiriyoruz.
+
+ConfusionMatrixDisplay.from_estimator(final_model, X_test, y_test)
+ConfusionMatrixDisplay.from_estimator(final_model, X_test, y_test, normalize="true")
+
+İlk grafik, ham sayılarla Confusion Matrix'i gösterirken, normalize edilmiş grafik, her sınıfın doğruluğunu gösterir.
+
+📋 Sınıflandırma Raporu 📋
+
+Modelin her sınıf için doğruluk (accuracy), geri çağırma (recall), kesinlik (precision) ve F1 skoru gibi metriklerini görmek için classification_report() fonksiyonunu kullanıyoruz.
+
+print(classification_report(y_test, final_pred))
+
+Bu rapor, modelin performansını ayrıntılı olarak gösterir. Yüksek precision ve recall değerleri, modelin doğru tahminlerde bulunduğunu gösterir.
+
+				🔄 GENEL TEKRAR 🔄
+
+# Kütüphanelerin import edilmesi
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Veriyi yükleyelim ve genel bilgilerimizi görelim
+
+df = pd.read_csv("mushrooms.csv")
+df.info()
+df.isna().sum().sum()
+df.describe().transpose()
+
+# Benzersiz değerlerin sayısını analiz edelim
+
+df.describe().T.sort_values(by="unique")
+
+# Eşsiz değerler ve sayıları
+
+pd.concat({"Eşsiz değer": df.apply(pd.unique), "sayısı": df.nunique()}, axis=1)
+
+# 'class' sütunundaki değerlerin sayısını görselleştirelim
+
+sns.countplot(data=df, x="class")
+df["class"].value_counts()
+
+# Her sütundaki benzersiz değer sayısını çubuk grafikle görselleştirelim
+
+sns.barplot(data=df.describe().transpose().reset_index().sort_values("unique"), x="index", y="unique")
+plt.xticks(rotation=90)
+
+# Veri kümesinin eğitim ve test verisine bölünmesi
+
+x = df.drop("class", axis=1)
+y = df["class"]
+x = pd.get_dummies(x, drop_first=True)
+
+# Eğitim ve test verilerine ayırma
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=9)
+
+# AdaBoost modelini oluşturma ve eğitme
+
+from sklearn.ensemble import AdaBoostClassifier
+model = AdaBoostClassifier(n_estimators=3)
+model.fit(X_train, y_train)
+mantar_pred = model.predict(X_test)
+
+# Modelin değerlendirilmesi
+
+from sklearn.metrics import classification_report, ConfusionMatrixDisplay, accuracy_score
+ConfusionMatrixDisplay.from_estimator(model, X_test, y_test)
+ConfusionMatrixDisplay.from_estimator(model, X_test, y_test, normalize="true")
+print(classification_report(y_test, mantar_pred))
+
+# En iyi model için n_estimators parametresini ayarlama
+
+hata_oranı = []
+for mantar_est in range(1, 30):
+    model = AdaBoostClassifier(n_estimators=mantar_est)
+    model.fit(X_train, y_train)
+    model_deneme_pred = model.predict(X_test)
+    hata = 1 - accuracy_score(y_test, model_deneme_pred)
+    hata_oranı.append(hata)
+
+# Veri kümesinin %5'ini rastgele seçme (örnekleme)
+
+df_sample = df.sample(frac=0.05, random_state=9)
+df_sample.info()
+
+# Hata oranı grafiklerini çizme
+
+plt.plot(range(1, 30), hata_oranı)
+
+# Modelin özelliklerin önem derecelerini inceleme
+
+model.feature_importances_
+feature_df = pd.DataFrame(index=x.columns, columns=["Katsayı"], data=model.feature_importances_)
+feature_df = feature_df[feature_df["Katsayı"] > 0]
+feature_df = feature_df.sort_values("Katsayı")
+sns.barplot(x=feature_df.index, y="Katsayı", data=feature_df)
+plt.xticks(rotation=90)
+
+# Final modelin eğitilmesi
+
+final_model = AdaBoostClassifier(n_estimators=18)
+final_model.fit(X_train, y_train)
+final_pred = final_model.predict(X_test)
+
+# Final modelin değerlendirilmesi
+
+ConfusionMatrixDisplay.from_estimator(final_model, X_test, y_test)
+ConfusionMatrixDisplay.from_estimator(final_model, X_test, y_test, normalize="true")
+print(classification_report(y_test, final_pred))
+
+ 			⚠️ Dikkat Edilmesi Gerekenler ⚠️
+
+Veri Temizliği ve Ön İşleme 🧹: Verinin eksiksiz ve doğru olduğundan emin olun. Eksik veriler varsa bunları ele almak için uygun yöntemler (örneğin, doldurma, çıkarma) kullanılmalı.
+
+Model Seçimi ve Parametre Ayarlama ⚙️: AdaBoost gibi modellerin parametreleri dikkatlice ayarlanmalıdır (örneğin, n_estimators parametresi). En iyi parametreyi bulmak için testler yapılmalıdır.
+
+Modelin Değerlendirilmesi 📊: Modelin başarımını sadece doğruluk (accuracy) ile değil, aynı zamanda Confusion Matrix ve sınıflandırma raporuyla değerlendirin. Bu, modelin her sınıf için ne kadar doğru tahmin yaptığı hakkında daha fazla bilgi verir.
+
+Özelliklerin Önem Dereceleri 🔍: Modelin hangi özelliklere daha fazla önem verdiğini inceleyerek, gerekirse özellik mühendisliği yaparak gereksiz özellikleri çıkarabilirsiniz.
+
+Test Verisi Kullanımı 🧪: Modelin aşırı uyum (overfitting) yapmadığından emin olmak için test verisi üzerinden doğru değerlendirme yapılmalıdır. Eğitim verisi ile test verisinin karışmamasına dikkat edin.
+
+
+		🌳🔥 Random Forest ve AdaBoost'ta get_dummies() Kullanımı 🌳🔥
+
+Makine öğrenmesi modellerinde, özellikle Random Forest 🌲 ve AdaBoost ⚡ gibi algoritmalarda, bağımsız değişkenlerin (X) tamamen sayısal olması gerekir. Ancak, hedef değişken (y) her zaman sayısal olmak zorunda değildir.
+
+Bu yüzden bazen pd.get_dummies() fonksiyonunu kullanarak kategorik değişkenleri sayısal hale getiriyoruz. Ancak, hangi değişken için get_dummies() uygulanması gerektiği modele bağlıdır.
+
+1️⃣ Random Forest'ta get_dummies() Kullanımı 1️⃣
+
+✅ Random Forest modeli, bağımsız değişkenlerin (X) numerik olmasını zorunlu kılar. Bu yüzden X için get_dummies() uygulamak gerekir.
+
+❌ Hedef değişken (y) için get_dummies() kullanmamıza gerek yoktur. Çünkü RandomForestClassifier zaten kategorik y ile çalışabilir.
+
+	🚫 Yanlış ama çalışır 🚫
+
+y = pd.get_dummies(df["Class"], drop_first=True)  # (Bunu yapmamıza gerek yoktu!)
+
+✅ Doğru ve yeterli olan:
+
+
+y = df["Class"]  # Y zaten kategorik olduğu için ekstra dönüşüm gerekmiyor.
+🔹 Sonuç:
+
+✅ X için get_dummies() kullanmak şart.
+🚫 y için get_dummies() gereksiz, çünkü sklearn zaten kategorik değerleri işleyebiliyor.
+
+2️⃣ AdaBoost'ta get_dummies() Kullanımı; 2️⃣
+
+✅ AdaBoost modeli için de bağımsız değişkenlerin (X) tamamen sayısal olması gerekir. Bu yüzden yine get_dummies() işlemi X için uygulanmalıdır.
+
+❌ Ancak, y için get_dummies() kullanmamıza gerek yoktur. Çünkü AdaBoost, hedef değişkenin kategorik olmasını zaten destekler.
+
+✅ Doğru kullanım:
+
+x = pd.get_dummies(df.drop("class", axis=1), drop_first=True)  # X için sayısal dönüşüm şart
+y = df["class"]  # Y doğrudan kategorik olabilir, ekstra dönüşüm gerekmiyor.
+
+🔹 Sonuç:
+
+✅ X için get_dummies() kullanmak şart.
+🚫 y için get_dummies() gereksiz, çünkü AdaBoost zaten kategorik y ile çalışabiliyor.
+
+🎯 Genel Sonuç: Ne Yapmalıyız? 🎯
+
+✅ Bağımsız değişkenler (X) → Her zaman sayısal olmalı! Bu yüzden pd.get_dummies(X) kullanılır.
+✅ Hedef değişken (y) → Scikit-learn modelleri genellikle doğrudan kategorik y ile çalışabilir. Bu yüzden pd.get_dummies(y) gereksizdir.
+
+🔹 Random Forest 🌲 ve AdaBoost ⚡ için X'i dummies'e çevirmek zorunlu.
+🔹 Ancak y için get_dummies() yapmak gereksizdir, çünkü modeller zaten kategorik y ile çalışabiliyor.
+
+📌 Özetle 📌
+
+✔ X için pd.get_dummies() zorunludur.
+❌ y için pd.get_dummies() yapmak gereksizdir!
+
+
+
+
+
+
+

@@ -1,0 +1,206 @@
+CROSS VALİDATİON NEDİR ?
+-- Cross-validation (çapraz doğrulama), makine öğrenmesi modellerinin genelleme performansını değerlendirmek için kullanılan bir tekniktir. Modelin belirli bir veri kümesi üzerinde aşırı öğrenmesini (overfitting) veya eksik öğrenmesini (underfitting) engellemek için veriyi farklı bölmelere ayırarak test eder.
+
+Neden Kullanılır?
+✅ Modelin farklı veri bölümlerinde nasıl performans gösterdiğini ölçer.
+✅ Aşırı öğrenmeyi (overfitting) tespit etmeye yardımcı olur.
+✅ Model seçimi ve hiperparametre ayarı için güvenilir bir değerlendirme sağlar.
+----------------------------------------------------------------------------------------------------
+			---- Kodlarla daya iyi anlayalım ----
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
+import numpy as np
+
+# 1. Veri setini eğitim ve test kümelerine ayırma
+# %70 eğitim, %30 test olacak şekilde bölme işlemi gerçekleştirilir.
+X_train, x_tv, y_train, y_tv = train_test_split(x, y, test_size=0.3, random_state=9)
+
+# Test kümesinin %50'sini modelin değerlendirme (validation) aşaması için ayırıyoruz.
+# Geri kalan %50'si ise modelin son test aşamasında kullanılacaktır.
+x_eval, x_test, y_eval, y_test = train_test_split(x_tv, y_tv, test_size=0.5, random_state=9)
+
+# Veri kümesi boyutlarını kontrol etme
+print("Eğitim kümesi boyutu:", X_train.shape)
+print("Değerlendirme kümesi boyutu:", x_eval.shape)
+print("Test kümesi boyutu:", x_test.shape)
+
+# 2. Veriyi ölçeklendirme
+# Modelin daha sağlıklı öğrenmesi için verileri standart ölçeklendirme işlemine tabi tutuyoruz.
+scaler = StandardScaler()
+scaler.fit(X_train)  # Ölçeklendirmeyi eğitim verisi üzerinden hesaplıyoruz.
+X_train = scaler.transform(X_train)
+x_eval = scaler.transform(x_eval)
+x_test = scaler.transform(x_test)
+
+# 3. Modelin oluşturulması ve eğitilmesi
+# Ridge regresyon modeli belirlenen alfa (regularization) parametresi ile oluşturuluyor.
+model = Ridge(alpha=103)
+model.fit(X_train, y_train)  # Model eğitim verisi ile eğitiliyor.
+
+# 4. Modelin değerlendirme kümesi üzerinde test edilmesi
+# Modelin x_eval üzerinde yaptığı tahminler hesaplanır.
+y_eval_pred = model.predict(x_eval)
+
+# Kök Ortalama Kare Hatası (RMSE) hesaplanarak modelin değerlendirme performansı ölçülür.
+rmse_eval = np.sqrt(mean_squared_error(y_eval, y_eval_pred))
+print("Değerlendirme RMSE:", rmse_eval)
+
+# 5. Modelin test kümesi üzerinde test edilmesi
+# Model x_test verisi ile tahmin yaparak son performansı ölçülür.
+y_final = model.predict(x_test)
+
+# Test kümesi için RMSE hesaplanarak modelin genel başarısı değerlendirilir.
+rmse_test = np.sqrt(mean_squared_error(y_test, y_final))
+print("Test RMSE:", rmse_test)
+
+				      📌 Kodun Amacı:
+
+Bu kod, bir makine öğrenmesi modelinin performansını değerlendirmek için standart bir işlem sırasını takip etmektedir:
+
+1-) Veri kümesini eğitim, değerlendirme ve test kümelerine ayırma
+2-) Veriyi ölçeklendirme
+3-) Ridge regresyon modelini eğitme
+4-) Değerlendirme (validation) kümesi ile ara test yapma
+5-) Son olarak test kümesi ile genel model başarısını ölçme
+----------------------------------------------------------------------------------------------------
+
+		---- Standart Scaler kullanımı zorunlu mudur ?  ---
+
+📌 1. Neden StandardScaler Kullandık?
+1️⃣ Ridge Regression, ağırlık katsayılarını küçültmeye çalışır.
+
+Ridge regresyonunun amacı, büyük ağırlıkları cezalandırarak aşırı öğrenmeyi (overfitting) önlemektir.
+Eğer verinin ölçekleri farklıysa, büyük değerlere sahip özellikler daha büyük ağırlık katsayılarına sahip olabilir ve model bunları öncelikli olarak öğrenebilir.
+StandardScaler kullanarak tüm özellikleri aynı ölçeğe getirdiğimizde, Ridge regresyonu her özelliği eşit şekilde değerlendirir.
+2️⃣ Gradient Descent (Gradyan İnişi) Daha Hızlı ve Verimli Çalışır.
+
+Ridge regresyonu arka planda Gradient Descent kullanarak katsayıları optimize eder.
+Eğer özellikler farklı ölçeklerdeyse, optimizasyon süreci dengesiz olur ve model daha yavaş ve düzensiz öğrenir.
+Özellikleri standartlaştırarak gradyan inişinin daha stabil çalışmasını sağlarız.
+3️⃣ Özellikle Mesafe Temelli Algoritmalarda Önemlidir.
+
+Ridge regresyonu Öklid mesafesi gibi hesaplamalara dayalı olduğu için farklı ölçeklerdeki veriler modelin yanlış öğrenmesine neden olabilir.
+StandardScaler kullanarak tüm özellikleri eşit öneme sahip hale getiririz.
+
+📌 2. Standartlaştırma Yapılmazsa Ne Olur?
+Eğer StandardScaler kullanmazsan, şu problemler yaşanabilir:
+❌ Büyük değerli özellikler (örneğin yıllık maaş) modelin öğrenme sürecinde baskın hale gelir.
+❌ Modelin optimizasyon süreci yavaş ve dengesiz olabilir.
+❌ Ridge Regression ağırlıkları küçültmekte zorlanabilir ve model kötü genelleme yapabilir.
+
+📌 3. Standartlaştırma Her Zaman Gerekli mi?
+Hayır! Bazı durumlarda StandardScaler kullanmaya gerek yoktur:
+✅ Karar ağaçları (Decision Tree, Random Forest, XGBoost) gibi ağaç tabanlı algoritmalar, verinin ölçeğinden bağımsız çalışır.
+✅ Lineer olmayan algoritmalar (örneğin Naive Bayes) ölçeklendirme gerektirmeyebilir.
+✅ Eğer tüm özellikler zaten aynı ölçek aralığındaysa, StandardScaler gereksiz olabilir.
+
+----------------------------------------------------------------------------------------------------
+
+📌 Kodunun Üzerinde Cross-Validation Uygulama Adımları:
+
+📌 Adım Adım Cross-Validation Uygulaması:
+
+from sklearn.model_selection import cross_val_score
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+# Veriyi eğitim ve test kümelerine ayırıyoruz
+X_train, x_tv, y_train, y_tv = train_test_split(x, y, test_size=0.3, random_state=9)
+x_eval, x_test, y_eval, y_test = train_test_split(x_tv, y_tv, test_size=0.5, random_state=9)
+
+# Veriyi ölçeklendirme
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train = scaler.transform(X_train)
+x_eval = scaler.transform(x_eval)
+x_test = scaler.transform(x_test)
+
+# Ridge regresyon modelini oluşturuyoruz
+model = Ridge(alpha=103)
+
+# 5-Fold Cross Validation işlemi
+# Veriyi 5 parçaya böler ve her parçada eğitip test ederiz.
+cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring="neg_mean_squared_error")
+
+# Sonuçları RMSE formatında görmek için karekökünü alıyoruz
+rmse_cv_scores = np.sqrt(-cv_scores)
+
+# Cross-validation sonuçları
+print("Cross-validation RMSE Scores: ", rmse_cv_scores)
+print("Ortalama Cross-validation RMSE: ", rmse_cv_scores.mean())
+
+----------------------------------------------------------------------------------------------------
+
+1. Veri Kümesinin Bölünmesi 📊:
+Veri, eğitim (X_train, y_train) ve test kümelerine ayrılır. Cross-validation, sadece eğitim kümesi üzerinde yapılır. Test verisi son değerlendirme için kullanılır, yani cross-validation’a dahil edilmez.
+
+2. Modelin Ölçeklendirilmesi 📏:
+Farklı birimlerdeki özellikler modelin doğru öğrenmesini engelleyebilir. StandardScaler kullanarak veriyi aynı ölçeğe getiririz, böylece model her özelliği eşit şekilde değerlendirir ve daha doğru öğrenir.
+
+3. Cross-Validation (Çapraz Doğrulama) 🔄:
+Cross-validation, modelin farklı veri bölmelerinde test edilmesini sağlar. 5 katmanlı cross-validation kullanarak modelin genelleme başarısını daha güvenilir bir şekilde ölçeriz. Her fold’da model eğitilir ve test edilir.
+
+4. scoring="neg_mean_squared_error" 🔍:
+MSE (Mean Squared Error), modelin hatalarını ölçer, ancak negatif bir değer döndürür. Sklearn maksimize etmeye çalıştığı için, neg_mean_squared_error kullanarak, MSE’nin negatifini alıp doğru şekilde değerlendirme yaparız.
+
+GENEL OLARAK CROSS VALİDATİON MANTIĞI ;
+
+Örnek: 5-Fold Cross Validation
+📊 Eğer 100 verimiz varsa ve 5-Fold CV kullanıyorsak:
+
+Fold	Eğitim Verisi (80%)     Test Verisi (20%)
+1. Kat	Fold 2, 3, 4, 5		Fold 1
+2. Kat	Fold 1, 3, 4, 5		Fold 2
+3. Kat	Fold 1, 2, 4, 5		Fold 3
+4. Kat	Fold 1, 2, 3, 5		Fold 4
+5. Kat	Fold 1, 2, 3, 4		Fold 5
+Sonuç olarak:
+📌 Model 5 kez eğitilir ve test edilir.
+📌 5 farklı test sonucu alınır ve ortalaması hesaplanır.
+
+----------------------------------------------------------------------------------------------------
+
+📊 SON KEZ TEKRAR EDELİM
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge		== İMPORT
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import mean_squared_error
+import numpy as np
+
+📊 1. Veri Kümesini Bölme
+# Veri kümesini eğitim ve test kümelerine ayırıyoruz
+X_train, x_tv, y_train, y_tv = train_test_split(x, y, test_size=0.3, random_state=9)
+
+ Test kümesinin yarısını validation (değerlendirme) kümesi için ayırıyoruz
+x_eval, x_test, y_eval, y_test = train_test_split(x_tv, y_tv, test_size=0.5, random_state=9)
+
+ 📏 2. Veriyi Ölçeklendirme
+# StandardScaler ile veriyi ölçeklendiriyoruz
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train = scaler.transform(X_train)
+x_eval = scaler.transform(x_eval)
+x_test = scaler.transform(x_test)
+
+🔄 3. Modeli Eğitme ve Cross-Validation Uygulama
+# Ridge regresyon modelini oluşturuyoruz
+model = Ridge(alpha=103)
+
+# 5 katmanlı cross-validation uyguluyoruz
+cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring="neg_mean_squared_error")
+
+# Sonuçları RMSE formatında görmek için karekökünü alıyoruz
+rmse_cv_scores = np.sqrt(-cv_scores)
+
+📊 Cross-validation sonuçları
+print("Cross-validation RMSE Scores: ", rmse_cv_scores)
+print("Ortalama Cross-validation RMSE: ", rmse_cv_scores.mean())
+
+
+

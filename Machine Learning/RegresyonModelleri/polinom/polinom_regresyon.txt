@@ -1,0 +1,438 @@
+-------------------- POLİNOM REGRESYON  --------------------
+
+Polinom regresyon, doğrusal regresyonun genelleştirilmiş bir versiyonudur ve doğrusal olmayan ilişkileri modellemek için kullanılır. Bu yöntemde bağımlı değişken (çıktı) ile bağımsız değişken (girdi) arasındaki ilişki, bir polinom denklemi ile ifade edilir.
+
+Basit doğrusal regresyon şu şekilde yazılır:
+y = b₀x^2 + b₁x + c
+
+Burada b₀ ve b₁ katsayılar, c hata terimidir.
+
+Polinom regresyonda ise bağımsız değişkenin üst dereceli terimleri eklenerek denklem genişletilir:
+y = b₀ + b₁x + b₂x² + b₃x³ + ... + bₙxⁿ + ε
+
+Burada n, polinomun derecesidir.
+
+Polinom regresyon ne zaman kullanılır?
+
+Eğer veriler doğrusal bir modelle iyi temsil edilemiyorsa, polinom regresyon daha uygun olabilir.
+Verilerde belirli bir eğilim olup olmadığını anlamak için kullanılır.
+
+Avantajları:
+
+Doğrusal regresyonun yetersiz kaldığı durumlarda daha iyi modelleme yapabilir.
+Karmaşık veri setleri için daha esnek bir model sunar.
+
+Dezavantajları:
+
+Derece çok yükselirse aşırı öğrenme (overfitting) riski oluşabilir.
+Yüksek dereceli polinomlar hesaplama açısından maliyetli olabilir.
+Python'da polinom regresyon, sklearn.preprocessing.PolynomialFeatures kütüphanesi ile uygulanabilir. Modelin doğruluğunu artırmak için uygun derece seçilmeli ve model değerlendirme metrikleri kullanılmalıdır.
+
+-------------------- POLİNOM REGRESYON ADIMLARI  --------------------
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt    == import
+import seaborn as sns
+ 
+---------------------------------------------------------------------                
+
+df = pd.read_csv("community_health_evolved.csv")
+x= df.drop("visits" , axis=1) #  X değişkeni (bağımsız değişkenler) 
+y= df["visits"]
+
+== Bu kod, Makine Öğrenmesi (ML) veya Veri Analizi projelerinde kullanılmak üzere bağımsız (X) ve bağımlı (y) değişkenleri ayırmak için yazılmıştır.
+
+Eğer regresyon modeli (örneğin, doğrusal regresyon veya polinom regresyon) oluşturmak istiyorsan, X ve y'yi modelin eğitimi için kullanabilirsin
+
+---------------------------------------------------------------------
+
+from sklearn.preprocessing import PolynomialFeatures
+
+# PolynomialFeatures, bağımsız değişkenlere polinom terimleri eklemek için kullanılan bir sklearn sınıfıdır.
+
+# Polinom dönüşümünü tanımla (derece 2, bias terimi eklenmez)
+ply_conv = PolynomialFeatures(degree=2, include_bias=False)
+
+# Parametreler:
+# degree=2 → İkinci dereceden polinom terimleri ekler.
+# include_bias=False → Bilinmeyen (intercept) terimi eklenmez.
+
+# Veri boyutunu kontrol et
+x.shape  # x'in (satır sayısı, sütun sayısı) şeklinde boyutunu döndürür.
+# Burada normalde (1000,6) lık bir değer çıkar.
+# fit_transform(x) de detaylı anlatım sağlanmıştır.
+
+# Polinom dönüşümünü uygula
+ply_feat = ply_conv.fit_transform(x)
+
+fit_transform(x):
+# - x içindeki bağımsız değişkenleri ikinci dereceden polinom terimlerine genişletir.
+# - Eğer x başlangıçta 6 sütuna sahipse, dönüşümden sonra 27 sütuna çıkabilir.
+# - Bunun formülü ((n) *(n+1)) / 2 den gelir. 
+# - 6*7 /2 = 21
+# - Baştaki 6 da üstüne eklenir ve toplam 27 değer olur. 
+
+# Alternatif kullanım:
+# ply_conv.fit(x)  # Modeli veriye uydurur (sadece öğrenme yapar).
+# ply_conv.transform(x)  # Daha önce öğrenilen dönüşümü uygular.
+# fit_transform(x) → Hem öğrenir hem de dönüşümü uygular.
+
+---------------------------------------------------------------------
+
+-------------------- TRAİN TEST SPLİT  --------------------
+
+from sklearn.model_selection import train_test_split
+
+# Veriyi eğitim ve test setlerine ayır
+# test_size=0.3 → Verinin %30'u test, %70'i eğitim için kullanılır
+# random_state=99 → Sonuçların tekrar üretilebilir olması için sabit rastgelelik kullanılır
+X_train, x_test, y_train, y_test = train_test_split(ply_feat, y, test_size=0.3, random_state=99)
+
+from sklearn.linear_model import LinearRegression
+
+# Lineer regresyon modelini tanımla
+# fit_intercept=True → Modelin sabit terimi (bias) öğrenmesini sağlar
+model = LinearRegression(fit_intercept=True)
+
+# Modeli eğitim verisiyle eğit
+model.fit(X_train, y_train)
+
+# Test verisi üzerinde tahmin yap
+poly_pred = model.predict(x_test)
+
+# Tahmin edilen değerleri yazdır
+poly_pred
+
+---------------------------------------------------------------------
+
+----------------------- PERFORMANS ---------------------------
+
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import numpy as np
+import seaborn as sns
+
+# Mean Absolute Error (MAE) hesapla
+# MAE → Gerçek ve tahmin edilen değerler arasındaki ortalama mutlak farkı ölçer
+mae = mean_absolute_error(y_test, poly_pred)
+
+# Root Mean Squared Error (RMSE) hesapla
+# RMSE → Hata karelerinin ortalamasının karekökünü alarak büyük hatalara daha fazla ağırlık verir
+rmse = np.sqrt(mean_squared_error(y_test, poly_pred))
+
+# R^2 Skoru (R-kare) hesapla
+# R^2 → Modelin bağımsız değişkenleri ne kadar iyi açıkladığını gösterir (1'e yakın olması iyidir)
+r2 = r2_score(y_test, poly_pred)
+
+# Sonuçları ekrana yazdır
+print("MAE :", mae)
+print("RMSE :", rmse)
+print("R2 :", r2)
+
+# Veri setinin çift değişkenli ilişkilerini görselleştir
+sns.pairplot(df)
+
+---------------------------------------------------------------------
+
+?????????????????????????????????????????????????????????????????????
+
+----------------------- NP.POLYFİT() ---------------------------
+
+Polinom regresyonu ile bir veri kümesine en iyi uyan polinomu belirler.
+Verilen x ve y değerleri için en uygun n. dereceden polinom katsayılarını döndürür.
+Veriler doğrusal olmayan bir yapıya sahipse, yüksek dereceli polinomlar daha iyi modelleme yapabilir.
+
+x= df["TV"]
+y= df["sales"]
+
+# 0 dan 300 e 100 adet sayı
+harcamalar = np.linspace(0,300 ,100) 
+
+--- 1. DERECE FONKSİYONLAR İÇİN ( ax +b ) ---
+
+# x ve y verilerini kullanarak 1. dereceden polinom (lineer) uydurur.
+np.polyfit(x,y,1) 
+
+satis = 0.04753664 * harcamalar + 7.03259355
+
+--- 2. DERECE FONKSİYONLAR İÇİN ( ax^2 + bx + c ) ---
+
+# x ve y verilerini kullanarak 2. dereceden polinom (lineer) uydurur.
+np.polyfit(x,y,2)
+
+satis = -6.84693373e-05 * harcamalar**2 +  6.72659270e-02*harcamalar +  6.11412013e+00
+
+sns.scatterplot(data=df , x="TV" ,  y = "sales" )
+plt.plot(harcamalar ,satis , color="r" , lw=4)
+
+--- 3. DERECE FONKSİYONLAR İÇİN ( ax^3 + bx^2 + cx +d ) ---
+
+# x ve y verilerini kullanarak 3. dereceden polinom (lineer) uydurur.
+np.polyfit(x,y,3)
+
+satis = 5.57199796e-07 * harcamalar **3 + -3.15222433e-04*harcamalar**2 + 9.64341770e-02*harcamalar+ 5.42010655e+00
+
+sns.scatterplot(data=df , x="TV" ,  y = "sales" )
+plt.plot(harcamalar ,satis , color="r" , lw=4)
+
+
+# Bütün bu işlemler sonucunda modelin yapısını anladık.
+# Şimdi denediğimiz bu polinom regresyon modelinden çıkarımlar yapalım.
+# Bir sonraki adım train test split
+
+----------------------- TRAİN TEST SPLİT ---------------------------
+
+x = df.drop("sales" , axis=1)
+y= df["sales"]
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    x, y, test_size=0.3, random_state=99)
+
+?????????????????????????????????????????????????????????????????????
+
+# ÖNCE LİNEER MODEL DE KONTROL EDELİM...
+
+--- ?? NEDEN POLY. REGR UYGULARKEN LİNN REGR. KULLANIYORUZ ?? ---
+
+Çünkü polinom regresyonun formu katsayılar açısından hala lineerdir.
+
+from sklearn.linear_model import LinearRegression
+
+model_linear = LinearRegression()
+model_linear.fit(X_train,y_train)
+
+pred_lin = model_linear.predict(X_test)
+
+?????????????????????????????????????????????????????????????????????
+
+# PERFORMANSLARINI İNCELEYELİM...
+
+from sklearn.metrics import r2_score , mean_absolute_error , mean_squared_error
+
+mae = mean_absolute_error(y_test , pred_lin)
+rmse = np.sqrt(mean_squared_error(y_test , pred_lin))
+
+print("Mae  : " , mae)
+print("Rmse :", rmse)
+
+res_lin = y_test - pred_lin
+
+sns.scatterplot(x=y_test , y = res_lin)
+
+sns.histplot(res_lin,bins=30 , kde=True)
+
+# FİNAL BİR LİNEER REGRESYON OLUŞTURUP POLY İLE FARKINI İNCELEYELİM...
+
+final_lin = LinearRegression()
+final_lin.fit(x,y)
+
+y_hat = final_lin.predict(x)
+
+----------------- GRAFİK -----------------
+fig, ax = plt.subplots(1,3,figsize=(15,5))
+
+ax[0].plot(df["TV"], df["sales"], "o", color="blue")
+ax[0].plot(df["TV"], y_hat, "o", color="red")
+ax[0].set_ylabel("Sales", size=14)
+ax[0].set_title("TV")
+
+ax[1].plot(df["radio"], df["sales"], "o", color="blue")
+ax[1].plot(df["radio"], y_hat, "o", color="red")
+ax[1].set_title("RADYO")
+
+ax[2].plot(df["newspaper"], df["sales"], "o", color="blue")
+ax[2].plot(df["newspaper"], y_hat, "o", color="red")
+ax[2].set_title("GAZETE")
+
+plt.tight_layout()
+
+# Mavi gerçek
+# Kırmızı bizim çıkardığımız.
+---------------------------------------------
+
+# POLİNOM MODELE GEÇİŞ YAPALIM...
+
+from sklearn.preprocessing import PolynomialFeatures
+
+poly_conv = PolynomialFeatures(degree=2 , include_bias=False)
+poly_feat = poly_conv.fit_transform(x)
+
+poly_feat.shape # # 3 * 4 /2
+
+# poly_feat, polinom özelliklerini içerdiği için, bu özelliklerle yapılan eğitim ve test bölünmesi, modelin doğrusal olmayan ilişkiyi öğrenmesine olanak tanır. Eğer sadece temel x özellikleri kullanılmış olsaydı, model doğrusal bir ilişkiyi öğrenmiş olurdu, fakat burada amaç daha karmaşık bir model kurmaktır.
+
+X_train, X_test, y_train, y_test = train_test_split(
+    poly_feat, y, test_size=0.3, random_state=99)
+
+
+model_poly = LinearRegression(fit_intercept=True)
+
+model_poly.fit(X_train , y_train)
+
+
+pred_polinom = model_poly.predict(X_test)
+
+# pred_polinom değişkeni, modelin polinom regresyonu ile yapılan tahmin sonuçlar demektir.
+mae = mean_absolute_error(y_test , pred_polinom)
+rmse = np.sqrt(mean_squared_error(y_test , pred_polinom))
+r2= r2_score(y_test, pred_polinom)
+
+
+print("Mae  : ", mae)
+print("Rmse : ", rmse)
+print("R2   : ",r2)
+
+
+*******************************************************************************************
+
+------------------------ EN İYİ POLİNOM DERECESİ ------------------------
+
+# RMSE (Root Mean Squared Error) değerlerini saklamak için boş listeler oluşturuyoruz
+train_rmse = []
+test_rmse = []
+
+# Polinom derecesini 1'den 9'a kadar değiştirerek test ediyoruz
+for d in range(1, 10):
+    
+    # Belirtilen dereceye sahip polinom özelliklerini oluştur
+    poly_conv = PolynomialFeatures(degree=d, include_bias=False)
+    poly_feat = poly_conv.fit_transform(x)  # x verisini polinom özelliklerine dönüştür
+    
+    # Veriyi eğitim ve test setlerine ayır (test seti %30, eğitim seti %70)
+    X_train, X_test, y_train, y_test = train_test_split(poly_feat, y, test_size=0.3, random_state=99)
+    
+    # Lineer Regresyon modelini oluştur ve eğit
+    model = LinearRegression(fit_intercept=True)
+    model.fit(X_train, y_train)
+    
+    # Modelin eğitim ve test setleri üzerinde tahmin yapmasını sağla
+    train_pred = model.predict(X_train)
+    test_pred = model.predict(X_test)
+    
+    # Eğitim ve test setleri için RMSE hesapla
+    train_RMSE = np.sqrt(mean_squared_error(y_train, train_pred))
+    test_RMSE = np.sqrt(mean_squared_error(y_test, test_pred))
+
+    # Hesaplanan RMSE değerlerini listelere ekle
+    train_rmse.append(train_RMSE)
+    test_rmse.append(test_RMSE)
+
+# train_rmse ve test_rmse listeleri, farklı polinom dereceleri için hata değerlerini içerir
+
+
+ŞİMDİ SIRA GÖRSELLEŞTİRME DE : 
+
+plt.plot(range(1,7),train_rmse[:6],label='TRAIN')
+plt.plot(range(1,7),test_rmse[:6],label='TEST')
+plt.xlabel("Polinom Derecesi")
+plt.ylabel("RMSE")
+plt.legend()
+
+-- Burada çıkan görselde 4 değerinde uçuk bir artış vardır
+-- Bu uçuk değer bize polinom derecesinin 4 olduğunu söyler.
+
+İyi Modeli Seçmek İçin ;
+
+-- Train RMSE ve test RMSE yakın olmalı ve test RMSE en düşük olduğu dereceyi seçmelisin.
+-- En iyi model test hatasının en düşük olduğu noktada bulunur.
+
+
+================== DEĞERİ 4 BULDUKTAN SONRA ============================
+
+# 4. dereceden polinom özellikleri oluştur
+poly_reg = PolynomialFeatures(degree=4)
+x_poly = poly_reg.fit_transform(x)  # x verisini polinom dönüşümüne tabi tut
+
+# Polinom regresyon modeli oluştur ve eğit
+poly_reg_final = LinearRegression()
+poly_reg_final.fit(x_poly, y)  # Modeli eğit
+
+# Artık poly_reg_final modelini kullanarak tahmin yapabilirsin
+y_pred = poly_reg_final.predict(x_poly)
+
+poly_reg_pred = poly_reg_final.predict(x_Poly)
+
+'''
+poly_reg_final modeli, daha önce eğittiğimiz polinom regresyon modelidir.
+predict(x_poly) fonksiyonu, polinom dönüşümü yapılmış x_poly verisini kullanarak tahmin yapar.
+Sonuç olarak, modelin tahmin ettiği y değerlerini poly_reg_pred içine kaydederiz.
+'''
+# HATALARI BULALIM ;
+mae = mean_absolute_error(y , poly_reg_pred)
+rmse = np.sqrt(mean_squared_error(y , poly_reg_pred))
+r2= r2_score(y, poly_reg_pred)
+print("Mae  : ", mae)
+print("Rmse : ", rmse)
+print("R2   : ",r2)
+
+
+# MODELİN NE KADAR İYİ ÇALIŞTIĞINA BAKALIM
+
+sns.scatterplot(x=x["TV"] ,y= y , color ="red" , data=df)
+plt.scatter(x["TV"] , poly_reg_pred , color="blue",s=10
+
+
+sns.scatterplot(x=x["radio"] ,y= y , color ="red" , data=df)
+plt.scatter(x["radio"] , poly_reg_pred , color="blue",s=10)
+
+
+sns.scatterplot(x=X["TV"], y=y, color = 'red',data=df) # ["TV"] olmadan çalıştır
+plt.scatter(X ,poly_pred_3, color = 'blue', s=10)
+plt.title('Truth or Bluff (Polynomial Regression)')
+plt.xlabel('Position level')
+plt.ylabel('Salary')
+plt.show()
+
+Bu adımların sonunda en iyi polinom derecesi ile model eğitilmiş ve yukarıda anlatımları sağlanmıştır.
+
+*******************************************************************************************
+
+				🚀 Polinom Regresyon ile Değer Tahmini Nasıl Yapılır?
+
+🔹 1️⃣ Polinom Dönüşümü Uygula
+
+ Öncelikle, eğitim aşamasında kullandığımız PolynomialFeatures dönüşümünü, tahmin yapacağımız veri için de uygulamalıyız. Çünkü modelimiz, polinom formunda bir veri bekliyor! 🎯
+
+deger_poly = poly_conv.transform(np.array([44.5, 39.3, 45.1]).reshape(1, -1))
+
+📌 Burada ne yaptık?
+✅ np.array([44.5, 39.3, 45.1]): Tahmin etmek istediğimiz giriş verisi.
+✅ .reshape(1, -1): 2D matris formatına çevirdik (Çünkü scikit-learn bunu bekliyor).
+✅ poly_conv.transform(...): Modeli eğitirken kullandığımız PolynomialFeatures dönüşümünü bu yeni giriş verisine uyguladık.
+
+🔹 2️⃣ Model ile Tahmin Yap
+ Polinom dönüşümünü uyguladıktan sonra, artık modelimizi kullanarak tahmin yapabiliriz! 🚀
+
+tahmin = model.predict(deger_poly)
+print(tahmin)
+
+📌 Burada ne yaptık?
+✅ model.predict(deger_poly): Öğrenilmiş model ile tahmini hesapladık.
+✅ print(tahmin): Sonucu ekrana yazdırdık.
+
+⚠ Önemli Noktalar
+
+🔸 poly_conv, eğitim aşamasında kullandığımız PolynomialFeatures nesnesi olmalıdır. Eğer kaybettiysen, yeniden oluşturman gerekir!
+🔸 reshape(1, -1) neden gerekli?
+Çünkü scikit-learn, giriş verisini her zaman 2D bir matris olarak bekler. Eğer 1D bir dizi verirsen hata alırsın! 🚨
+
+🎯 Özetle:
+📌 Önce tahmin yapmak istediğimiz veriyi polinom formuna dönüştürdük.
+📌 Sonra modeli kullanarak tahmini hesapladık.
+
+✨ Ve işte sonuç! 🚀🔮
+-------------------------------------------------------------------------------------------
+
+# include_bias = True
+
+- Polinom hale gelmiş veri setine tamamı birlerden oluşan bir sütün ekler
+
+- include_bias=True, genellikle bağımsız değişkenler kümesinde sabit terimi içermeyen durumlarda kullanılır.
+
+Eğer include_bias=False olarak ayarlanırsa, sabit terim (bias) eklenmez ve modelin orijinden geçmesi sağlanır.
+
+-------------------------------------------------------------------------------------------
+
+

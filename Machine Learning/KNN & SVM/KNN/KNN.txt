@@ -1,0 +1,334 @@
+					🔍 KNN (K-Nearest Neighbors) Algoritması Nedir? 🔍
+
+KNN, gözetimli öğrenme (supervised learning) yöntemlerinden biridir ve sınıflandırma 🏷️ ve regresyon 📈 için kullanılır.
+
+⚡ KNN’in Çalışma Mantığı ⚡
+
+1️⃣ Veri Noktasına En Yakın K Komşuyu Bulur 🔎
+2️⃣ Komşuların Etiketlerine Göre Karar Verir 🤝
+3️⃣ Sınıflandırma için En Çok Olan Sınıfı Seçer ✅
+4️⃣ Regresyon için Ortalama veya Ağırlıklı Ortalama Alır 📊
+ 
+🔥 KNN'in Avantajları 🔥
+
+✔ Kolay Uygulanır 🛠️
+✔ Parametrik Olmayan Bir Yöntemdir (Veri dağılımı varsayımı gerekmez) 🔄
+✔ Yeni verilerle kolay güncellenir ⏳
+
+⚠ KNN'in Dezavantajları ⚠
+
+❌ Büyük Veri Setlerinde Yavaş Çalışabilir 🐢
+❌ Özellik sayısı arttıkça performansı düşebilir 📉
+❌ Ölçeklendirme gerektirir (örneğin Min-Max Scaling veya Standartlaştırma) ⚖️
+
+🤔 Diğer Algoritmalardan Farkı🤔
+
+🔹 Karar Ağaçları 🌳 → Bölme temellidir, hiyerarşik kararlar alır
+🔹 Random Forest 🌲🌲🌲 → Birden fazla karar ağacının birleşimi, daha güçlü
+🔹 Gradient Boost 🚀 → Hata azaltma odaklı, ağırlıklı öğrenme yapar
+🔹 SVM 📏 → En iyi ayrım çizgisini (hiper düzlemi) bulmaya çalışır
+
+🎯 KNN Ne Zaman Kullanılır? 🎯
+
+✅ Küçük veri setlerinde 📊
+✅ Çizgisel olmayan problemlerde 🌀
+✅ Etiketli veriler mevcut olduğunda 🏷️
+
+KNN genellikle basit ama güçlü bir algoritmadır, ancak veri boyutu büyüdükçe daha verimli algoritmalara yönelmek gerekir! 🚀💡
+
+					🚀💡 ADIMLAR 🚀💡
+
+1️⃣ Veri Hazırlama 🗂️🔍
+2️⃣ Keşifçi Veri Analizi (EDA) 🔎📉
+3️⃣ Train-Test Split İşlemi 📂🔀
+4️⃣ Veri Ölçekleme 📏📊
+5️⃣ Model Oluşturma ve Eğitme 🏗️🎯
+6️⃣ Model Değerlendirme ✅📊
+7️⃣ Parametre Ayarlama 🎛️🔄
+8️⃣ Train-Test-Validation Ayrımı 📂📑🔍
+9️⃣ Cross Validation (Çapraz Doğrulama) 🔄📊
+
+
+					1️⃣ Veri Hazırlama 🗂️🔍
+
+Diğer eğitim bölümlerinde anlattığımız veri hazırlama işlemleriyle aynılarını yaptık.Tek fark aşağıda bulunan kod bloğudur.
+
+df.duplicated() Ne İşe Yarar?
+
+Bu komut, veri çerçevesindeki (DataFrame) duplikat (tekrarlanan) satırların sayısını bulur.
+
+Adım adım:
+
+df.duplicated()
+
+Bu fonksiyon, veri çerçevesindeki her satırın diğer satırlara göre tekrarlanıp tekrarlanmadığını kontrol eder.
+
+True: Eğer o satır daha önce görüldü (yani duplikat).
+False: Eğer o satır benzersiz (tekrarı yok).
+
+				2️⃣ Keşifçi Veri Analizi (EDA) 🔎📉
+
+1. `df.iloc[:20].style.background_gradient(cmap="viridis") 🌈
+
+Açıklama: Bu komut, veri çerçevesinin ilk 20 satırını alır ve arka planını viridis renk paletiyle renklendirir.
+Jinja2 hatası: Bu hatayı daha önce tartıştık. Jinja2 eksik olduğunda bu tarz stil ayarları çalışmaz.
+
+pip install jinja2 ile yüklenebilir.
+
+**2. sns.heatmap(df.corr(numeric_only=True), annot=True) 🔥
+
+Açıklama: Bu komut, veri çerçevesindeki sayısal sütunların korelasyon matrisini görselleştirir.
+
+df.corr(numeric_only=True): Sayısal sütunlar arasındaki korelasyonu hesaplar. Korelasyon, iki değişken arasındaki ilişkiyi ölçer (0 ile 1 arasında).
+annot=True: Hücrelerin üzerine korelasyon değerlerini yazdırır.
+
+Bu ısı haritası, değişkenler arasındaki ilişkinin gücünü ve yönünü (pozitif/negatif) renklerle görselleştirir.
+
+**3. sns.countplot(x="Purchased", data=df, palette="Purples") 📊
+
+Açıklama: Bu komut, "Purchased" (satın alındı mı?) değişkeninin değerlerinin dağılımını gösteren bir sütun grafiği (count plot) oluşturur.
+
+x="Purchased": X ekseninde "Purchased" sütununu kullanır.
+palette="Purples": Grafikteki renk paletini mor tonlarında ayarlar.
+
+Bu grafik, "Purchased" (alındı mı?) kolonundaki her bir sınıfın (evet/hayır) kaç kere olduğunu gösterir.
+
+**4. df[["Gender", "Purchased"]].value_counts() 👩‍🦱👨‍🦲
+
+Açıklama: Bu komut, "Gender" ve "Purchased" sütunlarının farklı kombinasyonlarını ve her bir kombinasyonun sayısını gösterir.
+
+Cinsiyet 1 ve almadıysa (130): Cinsiyeti 1 (muhtemelen kadın) olan ve satın almayan 130 kişi.
+Cinsiyet 0 ve almadıysa (127): Cinsiyeti 0 (muhtemelen erkek) olan ve satın almayan 127 kişi.
+Cinsiyet 0 ve aldıysa (77): Cinsiyeti 0 (erkek) olan ve satın alan 77 kişi.
+Cinsiyet 1 ve aldıysa (66): Cinsiyeti 1 (kadın) olan ve satın alan 66 kişi.
+
+Bu, cinsiyet ve satın alma ilişkisini anlamanızı sağlar.
+
+**5. sns.countplot(x="Gender", data=df, hue="Purchased") 👩‍🦱👨‍🦲
+
+Açıklama: Bu komut, "Gender" (cinsiyet) değişkenini kullanarak cinsiyet ve satın alma arasındaki ilişkiyi görselleştirir.
+
+hue="Purchased": Satın alınıp alınmadığına göre cinsiyetin dağılımını renkli bir şekilde gösterir.
+Bu grafik, kadın ve erkeklerin satın alıp almadıklarını daha net görselleştirir.
+
+**6. sns.pairplot(df, hue="Purchased") 🔀
+
+Açıklama: Bu komut, veri çerçevesindeki tüm sayısal sütunlar arasında ikili grafikler oluşturur ve "Purchased" sütununu renklerle gösterir.
+
+hue="Purchased": Satın alınıp alınmadığına göre renk kodlaması yapar.
+Pairplot, her bir özelliğin diğerleriyle olan ilişkisini anlamak için faydalıdır ve bu durumda, satın alma ile özellikler arasındaki ilişkileri analiz etmek için kullanılır.
+
+**7. sns.scatterplot(x="Age", y="EstimatedSalary", data=df, hue="Purchased") 💵
+
+Açıklama: Bu komut, Yaş (Age) ve Tahmin Edilen Maaş (EstimatedSalary) arasındaki ilişkiyi dağılım grafiği (scatter plot) olarak görselleştirir.
+hue="Purchased": Satın alınıp alınmadığına göre farklı renklerle gösterir.
+
+Bu grafik, yaş ve maaş ile satın alma arasındaki ilişkiyi görsel olarak analiz eder. Örneğin, satın alan ve almayan kişilerin yaş ve maaş dağılımlarını karşılaştırabilirsiniz.
+
+Özet:
+
+Heatmap 🔥: Korelasyonları görselleştirir.
+Countplot 📊: Kategorik verilerin dağılımını gösterir.
+Pairplot 🔀: Verinin tüm sayısal sütunları arasındaki ilişkileri analiz eder.
+Scatterplot 💵: İki değişken arasındaki ilişkiyi noktalarla gösterir.
+Her biri, farklı görselleştirme teknikleri kullanarak veriyi anlamamıza yardımcı olur.
+
+
+				3️⃣ Train-Test Split İşlemi 📂🔀
+
+Açıklama: Modelin eğitim ve test süreçlerinde kullanılacak verilerin ayrılması için train-test split işlemi yapılır. Bu işlem, veriyi eğitim verisi ve test verisi olarak ikiye ayırır. Böylece model, eğitim verisi üzerinde öğrenirken, test verisi ile doğrulanabilir.
+
+x = df.drop("Purchased", axis=1):
+
+Bu komut, "Purchased" sütununu veri çerçevesinden çıkarır ve geri kalan özellikleri bağımsız değişkenler (X) olarak alır.
+
+y = df["Purchased"]:
+
+Bu komut, "Purchased" sütununu hedef değişken (bağımlı değişken) olarak belirler, yani modelin tahmin etmeye çalışacağı etiket.
+
+from sklearn.model_selection import train_test_split:
+
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=9):
+
+📊 Sonuç: Bu işlem, eğitim verisini (X_train ve y_train) modelin öğrenmesi için, test verisini ise (X_test ve y_test) modelin doğruluğunu değerlendirmek için ayırır. Bu sayede modelin genelleme kabiliyeti test edilir.
+
+				4️⃣ Veri Ölçekleme 📏📊
+
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+scaled_X_train = scaler.fit_transform(X_train)
+scaled_X_test = scaler.transform(X_test)
+
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier(n_neighbors=3)
+knn.fit(scaled_X_train,y_train)
+pred= knn.predict(scaled_X_test)
+
+Açıklama: K-Nearest Neighbors (KNN), sınıflandırma ve regresyon problemlerinde kullanılan basit ama etkili bir algoritmadır. Bu algoritma, verilerin benzerliklerine göre sınıflandırma yapar. Yani, her veri noktasını, etrafındaki en yakın K komşusuyla sınıflandırır.
+
+from sklearn.neighbors import KNeighborsClassifier:
+
+KNN algoritmasını kullanabilmek için KNeighborsClassifier'ı içeri aktarırız.
+knn = KNeighborsClassifier(n_neighbors=3):
+
+KNN modelini başlatıyoruz. Burada n_neighbors=3 demek, her veri noktasının 3 en yakın komşusuna bakılarak sınıflandırma yapılacağı anlamına gelir.
+
+🎯 Modeli Eğitme ve Tahmin Yapma 🎯
+
+knn.fit(scaled_X_train, y_train):
+
+Eğitim verisi ile model eğitilir. Burada scaled_X_train özellikler (girdi verisi), y_train ise hedef değişken (etiket) verisidir. Model, bu verilerle sınıflandırmayı öğrenir.
+pred = knn.predict(scaled_X_test):
+
+Test verisi üzerindeki tahminler yapılır. scaled_X_test test verisi, model tarafından sınıflandırılır ve tahmin sonuçları pred değişkenine atanır.
+
+📊 Sonuç: Bu işlem, verilerin ölçeklendirilmesini ve ardından KNN algoritmasıyla eğitim verilerek test verisi üzerinde tahmin yapılmasını sağlar. Sonuçta, modelin doğruluğu test edilebilir ve KNN'nin sınıflandırma başarısı ölçülebilir.
+
+				5️⃣ Model Değerlendirme ✅📊
+
+
+Açıklama: Modeli eğittikten sonra, modelin ne kadar iyi performans gösterdiğini anlamak için değerlendirme yapmamız gerekir. Bu işlemde, modelin doğruluğunu ve tahminlerinin doğru olup olmadığını kontrol ederiz. Genellikle hata oranı, doğruluk oranı ve konfüzyon matrisi gibi metrikler kullanılır.
+
+Konfüzyon Matrisi (Confusion Matrix) 🔄
+
+Açıklama: Konfüzyon matrisi, modelin doğruluğunu değerlendirmede yaygın olarak kullanılır. Bu matris, doğru ve yanlış sınıflandırılan örnekleri gösteren bir tabloyu ifade eder. Bunu görselleştirebiliriz.
+
+ConfusionMatrixDisplay.from_estimator(knn, scaled_X_test, y_test):
+
+Bu komut, modelin test verisi üzerindeki tahminlerini kullanarak bir konfüzyon matrisi oluşturur ve bunu görselleştirir.
+
+Burada knn modelimiz, scaled_X_test test verisi ve y_test gerçek etiketlerle tahminlerde bulunur.
+
+📝 Sınıflandırma Raporu (Classification Report) 📝
+
+Açıklama: Sınıflandırma raporu, modelin performansını daha ayrıntılı bir şekilde sunar. Precision, Recall, F1-Score gibi metrikler içerir.
+
+print(classification_report(y_test, pred)):
+
+Bu komut, modelin tahminleri (pred) ve gerçek değerler (y_test) arasındaki farkları değerlendirir. Rapor, her sınıf için metrikler sağlar.
+
+
+				⚠️Hata Oranı Hesaplama (Error Rate) ⚠️
+
+hata_oranı=[]
+for k in range(1,40):
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(scaled_X_train,y_train)
+    knn_pred = knn.predict(scaled_X_test)
+
+    err =(1-accuracy_score(y_test , knn_pred))
+    hata_oranı.append(err)
+
+📊 Görselleştirme; 📊
+
+plt.figure(figsize=(10,6),dpi=200)
+plt.plot(range(1,40),hata_oranı,color="purple", linestyle="dashed" ,
+ marker="s" , markerfacecolor="yellow",label='Test Error')
+plt.legend()
+plt.ylabel('Hata Oranı')
+plt.xlabel("K Değeri")
+
+
+✅ Hata Oranı Hesaplama (Error Rate) Adımları: ✅
+
+-- hata_oranı=[]:
+Hata oranlarını saklamak için boş bir liste oluşturuluyor.
+
+-- for k in range(1, 40):
+Bu döngü, K değerlerini 1 ile 39 arasında test etmek için çalışır. Bu, KNN algoritmasında komşu sayısının etkisini görmeyi sağlar.
+
+-- knn = KNeighborsClassifier(n_neighbors=k):
+Her K değeri için bir KNeighborsClassifier modeli oluşturulur.
+
+-- knn.fit(scaled_X_train, y_train):
+Model, eğitim verisi (scaled_X_train ve y_train) üzerinde eğitilir.
+
+-- knn_pred = knn.predict(scaled_X_test):
+Eğitilen model, test verisi üzerinde tahminler yapar.
+
+-- err = (1 - accuracy_score(y_test, knn_pred)):
+Test verisi üzerinde yapılan tahminin doğruluğu hesaplanır. Hata oranı, 1 eksi doğruluk oranı olarak bulunur.
+
+-- hata_oranı.append(err):
+Hesaplanan hata oranı, hata_oranı listesine eklenir.
+
+📉 Hata Oranı Grafiği 📉:
+
+-- plt.figure(figsize=(10,6), dpi=200):
+Grafik boyutları ayarlanır ve çözünürlük yüksek tutulur.
+
+--plt.plot(range(1, 40), hata_oranı, color="purple", linestyle="dashed", marker="s", markerfacecolor="yellow", label='Test Error'):
+
+K değerlerine karşılık gelen hata oranları, mor renkte ve kesik çizgi ile çizilir. Veriler, her K değeri için nokta işaretçileriyle gösterilir.
+
+-- plt.legend():
+Grafikteki etiketler gösterilir.
+
+-- plt.ylabel('Hata Oranı'):
+Y ekseni etiketini belirler (Hata oranı).
+
+-- plt.xlabel("K Değeri"):
+X ekseni etiketini belirler (K değeri).
+
+Bu grafik, KNN modelinin K değeriyle hata oranının nasıl değiştiğini gösterir. Hata oranı en düşük olan K değeri, modelin en iyi performansı gösterdiği değerdir.
+
+
+Özet:
+Bu kod parçası, KNN modelinin K değeri ile hata oranını görselleştirir.
+Grafikte en iyi K değeri (en düşük hata oranı) belirlenebilir.
+
+
+-- 🏗️  Ortaya Çıkan bu değerler sonucunda final modelini oluşturarak değerlendirme yapabiliriz 🏗️--
+
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(scaled_X_train , y_train)
+pred_knn =knn.predict(scaled_X_test)
+
+ConfusionMatrixDisplay.from_estimator(knn , scaled_X_test , pred_knn )
+print(classification_report(y_test , pred_knn))
+
+* En iyi değeri 5 olarak yazdığımızda değerler bu şekilde çıkıyor
+
+
+				📏🔧 Neden StandardScaler Kullandık? 📏🔧
+
+
+1️⃣ Veri Ölçeklendirme:
+KNN, mesafe hesaplamaları yaptığı için farklı özellikler arasında büyük ölçek farkları varsa, büyük değere sahip özellikler mesafe hesaplamasında daha fazla ağırlık taşır. StandardScaler, verilerin ortalama (mean) değerini 0 ve standart sapmasını 1 yaparak, tüm özelliklerin aynı ölçekte olmasını sağlar.
+2️⃣ Mesafe Hesaplamaları İçin İdeal:
+KNN, Euclidean distance gibi mesafeleri kullanarak tahmin yapar. StandardScaler, verilerin doğru mesafelerde hesaplanmasını sağlar. Farklı ölçeklerdeki veriler, mesafe hesaplamalarını yanıltabilir.
+3️⃣ Veri Çeşitliliği ve Duyarlılık:
+KNN ve benzeri algoritmalar, verilerin aynı ölçeklerde olmasına duyarlıdır. StandardScaler, verilerin dağılımını değiştirmeden sadece ölçeklerini normalize eder, böylece modelin performansı artar.
+Sonuç:
+StandardScaler, KNN gibi algoritmaların doğru çalışması ve en iyi sonuçları vermesi için verilerin aynı ölçekte olmasını sağlar.
+
+
+				🤔🔢 Get Dummies Neden Kullanılmadı? 🤔🔢
+
+1️⃣ Sayısal Verilerle Çalışıyoruz:
+
+Get Dummies genellikle kategorik verileri sayısal verilere dönüştürmek için kullanılır. Yani, "cinsiyet", "şehir", "ürün kategorisi" gibi kategorik sütunları 0 ve 1'lere dönüştürür.
+Ancak burada kullandığımız veri, sayısal özelliklerden oluşuyor (örneğin, yaş, maaş gibi). Bu nedenle Get Dummies'e gerek yoktur, çünkü sayısal veriler zaten modelin çalışabilmesi için uygun formattadır.
+
+2️⃣ Özellikler Zaten Sayısal:
+
+Veri çerçevesinde, "Purchased" gibi kategorik değişkenler var ancak bu değişken zaten hedef değişken (y) olarak ayrıldığı için sayısal veriler üzerinde işlem yapıyoruz. Get Dummies'e ihtiyacımız yok çünkü biz şu an sayısal özelliklerle (X) ilgileniyoruz.
+
+3️⃣ Modelde Kategorik Veriler Yok:
+
+Eğer veri setinde "Gender", "City" gibi kategorik değişkenler olsaydı, Get Dummies ile bunları sayısal verilere dönüştürmemiz gerekebilirdi. Ancak şu an elimizde kategorik özellikler olmadığından, bu adımı atlayabiliyoruz.
+
+Özet:
+Get Dummies sadece kategorik verilerle çalışırken gereklidir. Sayısal veriler üzerinde StandardScaler gibi tekniklerle devam edilebilir. Bu sebeple burada Get Dummies kullanılmadı.
+
+
+
+
+
+
+
+
+
+

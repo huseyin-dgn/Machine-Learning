@@ -1,0 +1,447 @@
+LİNEER REGRESYON NEDİR ?
+
+* Lineer Regresyon'un temel amacı, bağımsız değişkenler (features) ile bağımlı değişken (target) arasındaki doğrusal ilişkiyi modellemek ve bu ilişkiyi kullanarak tahmin yapmaktır.
+
+Temel Hedef:-
+
+* Bağımsız değişkenler (örneğin, yaş, kilo, boy gibi faktörler) ile bağımlı değişken (örneğin, bir kişinin sağlık durumu, ziyaret sayısı, fiyat gibi hedef değişken) arasındaki ilişkileri anlamak ve bu ilişkiyi bir doğrusal denklemle modellemek.
+
+	      ----------- Lineer Regresyon İşlemleri --------------
+
+1️⃣ Veri Setinin İncelenmesi ve Temizlenmesi
+2️⃣ Özellikler (X) ve Hedef (y) Belirlenmesi
+3️⃣ Eğitim ve Test Verilerinin Ayrılması (Train-Test Split)
+4️⃣ Modelin Oluşturulması (LinearRegression Nesnesi Oluşturma)
+5️⃣ Modelin Eğitilmesi (fit Fonksiyonu ile Eğitim)
+6️⃣ Modelin Tahmin Yapması (predict Fonksiyonu ile)
+7️⃣ Model Performansının Değerlendirilmesi
+8️⃣ Modelin Kaydedilmesi ve Yüklenmesi (Joblib ile)
+
+
+1-) Kütüphaneleri import ediyoruz.
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn  as sns
+%matplotlib inline # Eğer grafikler Açılmazsa
+
+-------------------------------------------------------------------------
+
+2-) Dataframe i belirtiyoruz
+
+df = pd.read_csv("community_health.csv")
+
+"df" yazarak dataframe i inceleyebilirsiniz.
+
+-------------------------------------------------------------------------
+
+			Veri Setinin İncelenmesi ve Temizlenmesi
+		     (df.info(), df.describe(), sns.pairplot(), vb.)
+
+df.info() = Bir pandas DataFrame'inin yapısını özetleyen bilgileri gösterir. Bu komut, veri kümesindeki her bir sütun hakkında genel bir bakış sağlar.
+
+df.describe() =  count: Sütundaki eksik olmayan (non-null) değer sayısı.
+		 mean: Sütundaki ortalama (aritmetik ortalama) değeri.
+		 std: Sütundaki değerlerin standart sapması
+		 min: Sütundaki en küçük (minimum) değer.
+		 25%: Sütundaki 1. çeyrek değeri, yani %25'lik dilim.
+		 50%: Sütundaki medyan yani %50'lik dilim.
+		 75%: Sütundaki 3. çeyrek değeri, yani %75'lik dilim.
+		 max: Sütundaki en büyük (maximum) değer.
+
+df.isnull() = Boş mu dolu mu olduğu kontrol edilir.
+
+df.isnull().sum() = Boş olan kolonların sayısal verilerini verir.
+
+
+* corr fonksiyonu * : 
+
+ -- df["age"].corr(df["visits"]) 
+ ==  "age" (yaş) sütunu ile "visits" (ziyaret sayısı) sütunu arasındaki Pearson korelasyon katsayısını hesaplar.
+
+ -- Korelasyon Nedir -- 
+
+Korelasyon, iki değişken arasındaki ilişkinin doğrusal olup olmadığını ve bu ilişkinin pozitif mi, negatif mi yoksa sıfır mı olduğunu belirler.
+
+Pozitif Korelasyon: Bir değişken arttıkça diğer değişken de artar.
+Negatif Korelasyon: Bir değişken arttıkça diğer değişken azalır.
+Sıfır Korelasyon: İki değişken arasında doğrusal bir ilişki yoktur.
+Korelasyon değeri genellikle -1 ile 1 arasında bir değer alır:
+
+1: Mükemmel pozitif doğrusal ilişki (biri arttıkça diğeri de artar).
+-1: Mükemmel negatif doğrusal ilişki (biri arttıkça diğeri azalır).
+0: Hiçbir doğrusal ilişki yoktur (rastgele dağılır).
+
+-- Korelasyon Kullanım Amacı --
+
+** İki Değişken Arasındaki İlişkiyi Anlamak **
+
+Bu komut, yaş (age) ile ziyaret sayısı (visits) arasındaki doğrusal ilişkiyi anlamanızı sağlar. Örneğin, yaş arttıkça ziyaret sayısının artıp artmadığını ya da azalıp azalmadığını öğrenirsiniz.
+
+* Pairplot ile *
+
+sns.pairplot(df) = Pairplot, veri setindeki her bir sayısal sütun için, diğer tüm sayısal sütunlarla olan ilişkileri gösteren scatter plot'lar (dağılım grafikleri) oluşturur. Ayrıca, diagonal (çapraz) kısımlarda, her bir sayısal değişkenin kendi histogramını veya kernel density plot (yoğunluk tahmini) grafiğini gösterir.
+
+-------------------------------------------------------------------------
+				   Train Test Split
+
+			Özellikler (X) ve Hedef (y) Belirlenmesi
+	(İlgili sütunların seçilmesi, örn: x = df.drop("visits", axis=1), y = df["visits"])
+
+" sns.pairplot(df , diag_kind="kde") ":
+
+	diag_kind="kde" parametresi, grafiklerin diagonal (çapraz) alanlarında Kernel Density Estimate (KDE) grafiği çizmeyi belirtir.
+Diagonal alanlarda daha önce histogramlar görünürken, kde seçeneği ile yoğunluk tahmin grafiği (Kernel Density Plot) çizilir. Bu, verinin sürekli dağılımını daha pürüzsüz bir şekilde görselleştirir.
+
+	Hist yazarsak da farklı bir görselleştirme çıkar.Histin amacı sayısal analizi doğrudan gözlemlemektir
+
+'''
+df.rename(
+    columns={"age " : "yas",
+             "gender": "cinsiyet",
+             "race/ethnicity": "irk",
+             "weight":"kilo",
+             "height" : "boy"
+             }, inplace=True
+    )
+
+ Kolon isimlerini değiştirdik.
+
+'''
+
+df.head(3) = Dataframe deki ilk 3 değere baktık.
+
+
+df["kilo"] = round(df["kilo"] *0.45) = Kg ye dönüştürdük
+
+df["boy"] = round(df["boy"] * 2.54) = Cm ye dönüştürdük
+
+df["cinsiyet"] = df["cinsiyet"].replace({"female": 0, "male": 1})
+# Female : 0
+# Male : 1
+
+df["irk"] = df["irk"].replace({"group A" :1 ,"group B" : 2 , "group C" : 3 , "group D" :4 ,"group E" : 5}.)
+
+
+df.to_csv("community_health_MLLR.csv" , index=False) = Düzeltilen dataframe i kayıt ettik.
+
+# index=False, CSV dosyasına DataFrame'in indeks sütununun yazılmamasını
+
+-------------------------------------------------------------------------
+		Eğitim ve Test Verilerinin Ayrılması (Train-Test Split)
+			(train_test_split ile verinin bölünmesi)
+
+ Train-Test Split, makine öğrenmesi ve veri bilimi projelerinde kullanılan bir tekniktir ve modelin genelleme yeteneğini test etmek için oldukça önemlidir. Amaç, modelin eğitim (training) ve test (testing) aşamalarındaki performansını değerlendirebilmektir.
+
+x= df.drop("visits" , axis=1) == X i visits kolunu olmayan bir hale getir 
+y=df["visits"] == Y yi de yalnızca visits olacak şekilde değerlendir.               
+
+# AXİS = 1 => SÜTÜN
+# AXİS = 0 => SATIR
+
+
+	" from sklearn.model_selection import train_test_split " 
+
+
+		X_train, X_test, y_train, y_test = train_test_split(
+   			x, y, test_size=0.3, random_state=99)
+
+# eğitim seti = Train : Model, bu veriden öğrenir ve kalıpları keşfeder
+# test seti = Test : Eğitim sırasında hiç görmediği verilerle test edilir.
+# test_size =Buu test setinin oranını ifade eder.Örneğin, test_size=0.33 ifadesi, verinin %33'ünün test seti, geri kalan %67'sinin eğitim seti olarak ayrılacağını belirtir.
+
+			" X_train.head() "
+
+Bu komut, X_train verisindeki ilk 5 satırı gösterir. Burada, her bir satır bir eğitim örneğini ve her bir sütun ise özellikleri (input variables) temsil eder.
+-------------------------------------------------------------------------
+		Modelin Oluşturulması (LinearRegression Nesnesi Oluşturma)
+
+	"" from sklearn.linear_model import LinearRegression # import ""
+
+regr = LinearRegression() : Regr adında regresyon örneği
+			    LinearRegression sınıfından bir nesne oluşturuluyor.
+			    'regr', doğrusal regresyon modelini temsil eden bir örnek olacak.
+
+-------------------------------------------------------------
+		Modelin Eğitilmesi (fit Fonksiyonu ile Eğitim)
+
+
+			regr.fit(X_train , y_train)
+
+'''
+regr: Önceki adımdaki gibi, doğrusal regresyon modelini temsil eden nesne.
+
+X_train: Modelin eğitim verisi olan özellikler (input features). Bu, modelin tahmin yapabilmesi için gerekli olan veriler.
+
+y_train: Eğitim verisinin hedef değişkeni veya etiketleri (output labels). Model, bu verileri kullanarak doğru tahminleri öğrenmeye çalışacaktır.
+
+'''
+-------------------------------------------------------------
+		test_preds = regr.predict(X_test)
+
+regr: Önceki adımda eğitilen doğrusal regresyon modelini temsil eder.
+
+X_test: Test verisi, yani modelin eğitim sırasında hiç görmediği veriler. Bu veriler, modelin genelleme yeteneğini test etmek için kullanılır.
+
+test_preds: Bu değişken, modelin X_test üzerinde yaptığı tahminlerin (predictions) sonuçlarını içerir.
+
+test_preds değerini direkt yazdırdığımızda her değer için gerekli tahminlerin sayısına erişebiliriz.
+-------------------------------------------------------------
+
+	from sklearn.metrics import r2_score, mean_absolute_error,mean_squared_error 
+
+Scikit-learn kütüphanesinden üç farklı regresyon başarı metriğini import eder. Bu metrikler, modelin tahmin performansını değerlendirmek için kullanılır.
+
+r2_score: Büyük bir R² değeri daha iyi demek
+	
+    Tanım: R² (R-kare), modelin bağımlı değişkendeki (hedef değişken) varyansı ne kadar açıklayabildiğini ölçen bir istatistiksel değerdir. Yüksek bir R² değeri, modelin doğru tahminler yapma yeteneğini gösterir.
+
+mean_absolute_error (MAE): Küçük bir MAE değeri daha iyi demektir
+
+   Tanım: Mean Absolute Error (MAE), modelin tahminlerinin ortalama mutlak hatasını ölçer. Yani, her bir tahminin ne kadar "yanlış" olduğunu gösterir. Düşük bir MAE değeri, modelin doğru tahminler yaptığı anlamına gelir.
+Hesaplanma: Tüm tahmin hatalarının mutlak değeri alınır ve bunların ortalaması alınır.
+
+mean_squared_error (MSE): Küçük bir MSE değeri daha iyi demektir
+   Tanım: Mean Squared Error (MSE), modelin tahminlerinin kareli hata ortalamasıdır. MSE, hataların büyüklüğüne duyarlıdır ve büyük hataları daha fazla cezalandırır. Bu metrik, özellikle daha büyük hataların cezalandırılmasını istediğinizde kullanılır.
+Hesaplanma: Hataların karesi alınır ve ardından bunların ortalaması hesaplanır.
+
+- Şimdi bu değerleri nasıl yazdıracağımıza ve yorumlayacağımıza bakalım -
+
+ 	--	print("Theta :     ", (regr.coef_[0]))     --
+
+regr.coef_[0]: Bu, modelin eğim katsayısı (θ1) değeridir.
+Eğim katsayısı, regresyon denkleminde bağımsız değişkenin (input) hedef değişken üzerindeki etkisini gösterir. 
+Yani, bu sayı, bağımsız değişkenin her bir birim artışının, hedef değişkende (yani "visits" gibi) ne kadar bir değişim yaratacağını ifade eder.
+Örneğin, diyelim ki modelin θ1 değeri 0.5. Bu durumda, her bir 1 birim artışta, hedef değişkende (örneğin, "visits") 0.5 birim artış olacağı anlamına gelir.
+
+
+          --     print("Intercept : ", (regr.intercept_))      -- 
+
+Intercept, regresyon denklemindeki sabit terimdir ve bağımsız değişkenin değeri sıfır olduğunda hedef değişkenin (output) aldığı değeri gösterir.
+Yani, bağımsız değişkenin (örneğin "age" ya da "weight") değeri sıfır olduğunda, hedef değişkenin değeri bu sabit terim (intercept) olacaktır.
+
+
+     --    print("R^2 : ", round(r2_score(y_test,test_preds),2))    --
+
+R² (R kare) istatistiği, modelin bağımsız değişkenler ile bağımlı değişken arasındaki ilişkiyi ne kadar iyi açıkladığını ölçer. Yani, modelin hedef değişkenin varyansını ne kadar açıkladığını belirtir.
+
+# 2 : Ondalıklı sayıya yuvarla demektir.
+
+R² değeri 1'e yaklaştıkça, modelin gerçek verilerle uyumu artar. R² = 0 olduğunda, model hiçbir anlamlı bilgi sağlamaz, sadece verilerin ortalamasını kullanıyor gibi düşünülebilir.
+R² değeri negatif bile olabilir, bu da modelin ortalama tahmin yapmaktan bile kötü olduğu anlamına gelir.
+
+
+--   print("MAE :", round(mean_absolute_error(y_test,test_preds),2))   --
+
+MAE, modelin yaptığı tahminlerin ne kadar yanıldığını gösterir. Tahminlerin her birinin ne kadar yanlış olduğunu ölçer ve ardından bunların ortalamasını alır.
+Küçük bir MAE değeri, modelin doğru tahminler yaptığı anlamına gelir. Eğer MAE 0 ise, model tamamen doğru tahminler yapıyor demektir.
+
+
+print("RMSE :", round(np.sqrt(mean_squared_error(y_test,test_preds)),2))
+
+
+MSE, tahminlerin ne kadar yanlış olduğunu ölçen bir başka metriktir, ancak bu sefer hata karelerinin ortalaması alınır. Bu, büyük hataları daha fazla cezalandırır.
+MSE'nin karekökü alınarak RMSE (Root Mean Squared Error) hesaplanır. RMSE, hata miktarını gerçek birimler cinsinden gösterir (örneğin, ziyaret sayısı gibi).
+RMSE değeri küçük olduğunda, modelin doğru tahminler yaptığı söylenebilir. Eğer RMSE 0 ise, model hatasız çalışıyor demektir.
+
+-------------------------------------------------------------
+
+	--      	   Final         	 -- 
+
+
+final = LinearRegression()
+
+final.fit(x,y) 
+
+# x modelin tahmin yapabilmesi için gerekli girdi verileri
+
+# y ise modelin tahmin etmeye çalıştığı çıktı verisidir.
+
+# fit fonksiyonu, doğrusal regresyon modelini veriye göre eğitmek için kullanılır.
+
+y_hat = final.predict(x)
+
+#  Bu, modelin daha önce öğrendiği doğrusal ilişkiyi kullanarak, verilen x (bağımsız değişkenler) için tahminler yapmasını sağlar.
+
+final.coef_ 
+
+# Burası bize her kolonun hesaplamada ne kadar etkisi olduğunu gösterir.
+
+coef_df = pd.DataFrame(final.coef_ , x.columns , columns=["Katsayı"])
+
+# Bu şekilde yazarak coef_df değerini çağırırsak tablolanmış biçimde göstermiş oluruz.
+
+print(df["age"].mean())
+print(df["cinsiyet"].mean())
+print(df["irk"].mean())
+print(df["kilo"].mean())
+print(df["boy"].mean())
+
+# Her kolondaki ortalama değeri hesapladık.
+-------------------------------------------------------------
+
+		Modelin Tahmin Yapması (predict Fonksiyonu ile)
+
+insan_evladı =[[30 , 0 , 1 , 60, 164 ]]
+# Koyulan 2 parantez 2 boyutlu dizi olduğunu belirtir
+
+final.predict(insan_evladı)
+# Makine değer tahmin etti:
+
+x.iloc[135]
+# 135. index değeri getir demek istiyor
+
+denek= [[45,1,4,107,180]] 
+# 135. değerdeki kolonları yeni bir veri gibi yazdırdık.
+
+Bu incelemeler sonucunda modelin ne kadar doğru çalıştığını anlayabiliriz.
+
+-------------------------------------------------------------
+
+	Modelin Kaydedilmesi ve Yüklenmesi (Joblib ile)
+
+from joblib import dump , load
+
+dump(final, "dr_hastsa_visit.joblib")
+
+model_down= load("dr_hastsa_visit.joblib")
+# model_down artık, kaydedilen modelin bir kopyasıdır ve tahmin yapabilmek için kullanılabilir.
+
+model_down.predict(hyso)
+
+-------------------------------------------------------------
+
+	--      	Residual ( Hata Terimi ) 	  --
+
+📌 Residual (Hata Terimi), gerçek değer ile tahmin edilen değer arasındaki farktır.
+
+📌 Matematiksel olarak:
+
+    Resudial = Gerçek Değer - Tahmin edilen Değer
+
+
+resudial= y_hat -y 
+# Her veri için hata tahmini 
+
+plt.figure(figsize=(12,8), dpi = 120)
+sns.scatterplot(x=y , y=residual , s=70)
+plt.axhline(y=0 , color="r", ls="-" , lw=4)
+
+# Bu şekilde de görselleştirilebilir.
+ 
+
+  		     -- HATA TAHMİNİNİ İNCELEYELİM --
+
+# 2 satır ve 3 sütundan oluşan bir grid (subplot) oluşturuyoruz, her bir grafiği bu eksenlere yerleştireceğiz
+fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(16, 12))
+
+# İlk eksen: Age vs Visits (Gerçek veri ve tahminler)
+axes[0, 0].plot(df['age'], df['visits'], 'o')  # Gerçek 'visits' verisi ile scatter plot
+axes[0, 0].plot(df['age'], y_hat, 'o', color='red')  # Tahmin edilen 'visits' verisi (y_hat) kırmızı renk ile
+axes[0, 0].set_ylabel("visits")  # Y eksenine etiket ekliyoruz (Visits)
+
+# İkinci eksen: Cinsiyet vs Visits (Gerçek veri ve tahminler)
+axes[0, 1].plot(df['cinsiyet'], df['visits'], 'o')  # Gerçek 'visits' verisi ile scatter plot
+axes[0, 1].plot(df['cinsiyet'], y_hat, 'o', color='red')  # Tahmin edilen 'visits' verisi (y_hat) kırmızı renk ile
+axes[0, 1].set_ylabel("visits")  # Y eksenine etiket ekliyoruz (Visits)
+
+# Üçüncü eksen: Irk vs Visits (Gerçek veri ve tahminler)
+axes[0, 2].plot(df['irk'], df['visits'], 'o')  # Gerçek 'visits' verisi ile scatter plot
+axes[0, 2].plot(df['irk'], y_hat, 'o', color='red')  # Tahmin edilen 'visits' verisi (y_hat) kırmızı renk ile
+axes[0, 2].set_ylabel("visits")  # Y eksenine etiket ekliyoruz (Visits)
+
+# Dördüncü eksen: Kilo vs Visits (Gerçek veri ve tahminler)
+axes[1, 0].plot(df['kilo'], df['visits'], 'o')  # Gerçek 'visits' verisi ile scatter plot
+axes[1, 0].plot(df['kilo'], y_hat, 'o', color='red')  # Tahmin edilen 'visits' verisi (y_hat) kırmızı renk ile
+axes[1, 0].set_ylabel("visits")  # Y eksenine etiket ekliyoruz (Visits)
+
+# Beşinci eksen: Boy vs Visits (Gerçek veri ve tahminler)
+axes[1, 1].plot(df['boy'], df['visits'], 'o')  # Gerçek 'visits' verisi ile scatter plot
+axes[1, 1].plot(df['boy'], y_hat, 'o', color='red')  # Tahmin edilen 'visits' verisi (y_hat) kırmızı renk ile
+axes[1, 1].set_ylabel("visits")  # Y eksenine etiket ekliyoruz (Visits)
+
+# Alt satırdaki eksenlerin olduğu görsellerin düzeninin daha iyi olmasını sağlamak için
+plt.tight_layout()  # Bu, grafiklerin sıkışmamasını ve düzgün yerleşmesini sağlar.
+
+-------------------------------------------------------------
+
+SON OLARAK HEPSİNİ SIRALAYALIM:
+
+ 		-- İMPORT KISIMLARI --
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn  as sns
+
+---------------------------------------------------------------------
+
+		-- Data Frame İncelenmesi --
+  
+df=pd.read_csv("community_health.csv")
+sns.pairplot(df)
+df.info()
+df.isnull().sum()
+
+df.rename(
+    columns={"age " : "yas",
+             "gender": "cinsiyet",
+             "race/ethnicity": "irk",
+             "weight":"kilo",
+             "height" : "boy"
+             }, inplace=True
+    )
+
+df["kilo"]  = round(df["kilo"] *0.45)
+df["cinsiyet"] = df["cinsiyet"].replace({"female" : 0 , "male" : 1})
+df.head(5)
+
+df["irk"] = df["irk"].replace({"group A" :1 ,"group B" : 2 , "group C" : 3 , "group D" :4 ,"group E" : 5})
+
+---------------------------------------------------------------------
+
+		-- TRAİN TEST STPLİT --
+
+x= df.drop("visits" , axis=1)
+y= df["visits"]
+
+from sklearn.model_selection import train_test_split
+
+X_train , x_test , y_train , y_test = train_test_split(x,y,test_size=0.33 , random_state=99)
+
+x_test.head()
+X_train.head()
+
+from sklearn.linear_model import LinearRegression
+
+regr = LinearRegression()
+
+regr.fit(X_train , y_train)
+test_preds = regr.predict(x_test)
+
+from sklearn.metrics import r2_score , mean_absolute_error , mean_squared_error
+
+print("R^2 : ", round(r2_score(y_test,test_preds),2))
+print("MAE :", round(mean_absolute_error(y_test,test_preds),2))
+print("RMSE :", round(np.sqrt(mean_squared_error(y_test,test_preds)),2))
+
+---------------------------------------------------------------------
+
+		-- Eklenen Değere Tahmin  --
+
+insan=[[20 , 1,1,80,184 ]]
+regr.predict(insan)
+
+y_hat= regr.predict(x)
+
+---------------------------------------------------------------------
+
+		-- Hata Fonksiyonu  --
+resudial = y_hat - y
+
+sns.scatterplot(x=y , y= resudial , s=70)
+plt.axhline(y=0, color="r" , ls ="-" , lw =4)
+
+
+

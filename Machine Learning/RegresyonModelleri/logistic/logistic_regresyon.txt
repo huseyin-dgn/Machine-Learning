@@ -1,0 +1,523 @@
+Lojistik Regresyon Neden Kullanılır? 🤔
+
+İkili Sınıflandırma (Binary Classification):
+📨 ➡️ 💻 Spam / Spam Değil
+💔 ➡️ ❤️ Hastalık / Sağlık
+
+Olasılık Verir:
+🤔 ➡️ %70 (Evet, spam) / %30 (Hayır, spam değil)
+
+Basit ve Yorumlanabilir:
+🎯 Ağırlıklar (weights) ile neyin önemli olduğunu açıkça görürsünüz:
+🔍 Yaş, Gelir gibi özelliklerin etkilerini anlamak kolay.
+
+Hızlı ve Verimli:
+⚡️ Küçük Veri Setleri veya Büyük Veri Setleri için uygun.
+
+Çoklu Sınıf Problemleri:
+🍎 / 🍌 / 🍉 Elma, Muz, Kavun gibi seçenekler arasından hangisi?
+➡️ Softmax ile çözülebilir.
+
+Özetle:
+Lojistik regresyon, ikili kararlar verirken ve olasılıkları tahmin ederken oldukça pratik ve anlaşılır bir yöntemdir! 🎯
+
+Bu regresyon modelinde görselleştirmeye biraz daha dikkat etmemiz gerekli.Hangi değerin ne kadar neyi etkilediği göz önüne sermek logistic regresyon için güzel bir uygulama olacaktır.
+
+**********************************************************************
+
+  		     --  GÖRSELLEŞTİRME --
+📊🔥 Isı Haritası Zamanı!
+
+plt.figure(figsize=(7,8))
+sns.heatmap(df.corr() , annot=True)
+
+Kodun yaptığı:
+
+🖼️ plt.figure(figsize=(7,8)) → Grafik boyutunu 7x8 inç olarak ayarlar.
+🌡️ sns.heatmap(df.corr(), annot=True) → 📊 Korelasyon matrisi için ısı haritası oluşturur.
+🔍 df.corr() → Verilerin korelasyonlarını hesaplar.
+📝 annot=True → Hücrelere sayısal değerleri ekler.
+💡 Sonuç: Verilerin birbirleriyle olan ilişkisini renkli ve okunaklı bir şekilde gösteren bir grafik elde edilir! 🎨✨
+
+
+📊✨ Dağılım Grafiği Zamanı!
+
+sns.scatterplot(x="HP" , y="Legendary" , data=df) 
+
+Kodun yaptığı:
+📈 Dağılım grafiği (scatter plot) oluşturur.
+🏷️ x="Total" → X eksenine Total sütununu koyar.
+🏷️ y="Legendary" → Y eksenine Legendary sütununu koyar.
+📊 data=df → df adlı veri çerçevesinden (DataFrame) verileri kullanır.
+💡 Sonuç: Her veri noktasını bir nokta olarak gösteren bir grafik elde edilir. Veriler arasındaki ilişkileri analiz etmeye yardımcı olur! 🔍🎯
+
+📊🐉 Scatter Plot ile Veri Keşfi!
+
+sns.scatterplot(x="HP" , y="Legendary" , data=df) 
+
+Kodun yaptığı:
+
+sns.scatterplot(x="HP", y="Legendary", data=df)
+🔵 HP (Can Değeri) ile Efsanevi Olma Durumu arasındaki ilişkiyi gösterir.
+🏷️ x="HP" → X ekseninde Pokémon'un HP (Can Puanı) yer alır.
+🏷️ y="Legendary" → Y ekseninde Pokémon'un Efsanevi olup olmadığı (Legendary: 0 veya 1) gösterilir.
+📊 data=df → Veriler df adlı DataFrame'den alınır.
+💡 Sonuç:
+
+Efsanevi Pokémon’ların (Legendary = 1) HP’si yüksek mi? 🛡️
+Normal Pokémon’lar (Legendary = 0) genellikle hangi HP aralığında? 📏
+Belirgin bir dağılım var mı? 📉📈
+
+
+🛠Bar Plot ile Veriler
+
+sns.barplot(x=coef.index, y=coef.values, palette="bright")
+
+📊 Özelliklerin model üzerindeki etkisini görselleştirir.
+🎯 En büyük pozitif katsayılar = Efsanevi olmayı en çok etkileyen özellikler
+🔻 En büyük negatif katsayılar = Efsanevi olmamayı etkileyen özellikler
+
+**********************************************************************
+		      -- TRAİN TEST SPLİT --
+🛠 Kod Açıklaması Adım Adım
+
+1️⃣ Veriyi Hazırlama
+x = df.drop("Legendary", axis=1)  # 'Legendary' sütununu çıkararak bağımsız değişkenleri belirler
+y = df["Legendary"]  # 'Legendary' sütununu bağımlı değişken (etiket) olarak atar
+x.iloc[3:8]  # 3. ve 8. indeksler arasındaki değerleri getirir.
+
+📌 Amaç:
+X (Bağımsız değişkenler): Pokémon’un istatistikleri (HP, Attack, Speed vb.)
+Y (Bağımlı değişken): Pokémon’un efsanevi olup olmadığı (1 = Efsanevi, 0 = Normal)
+
+2️⃣ Train-Test Split (Veriyi Bölme)
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+X_train, X_test, y_train, y_test = train_test_split(
+    x, y, test_size=0.4, random_state=9)
+🔹 test_size=0.4 → Verinin %40'ı test, %60'ı eğitim için ayrıldı
+🔹 random_state=9 → Tekrar üretilebilirlik için sabit rastgelelik sağlandı
+
+3️⃣ Veriyi Ölçeklendirme 🔢
+scaler = StandardScaler()  # StandardScaler nesnesi oluştur
+scaled_X_train = scaler.fit_transform(X_train)  # X_train verisini ölçeklendir (mean=0, std=1)
+scaled_X_test = scaler.transform(X_test)  # X_test verisini aynı dönüşümle ölçeklendir
+
+📌 Neden gerekli?
+Bazı sütunlar (HP, Attack) büyük, bazıları küçük olabilir.
+Lojistik Regresyon gibi modeller, ölçeklendirilmemiş verilerde kötü performans gösterir.
+StandardScaler 📏, tüm özellikleri ortalaması 0, standart sapması 1 olacak şekilde dönüştürür.
+
+4️⃣ Lojistik Regresyon Modelini Eğitme 🤖
+from sklearn.linear_model import LogisticRegression
+log_model = LogisticRegression()  # Modeli oluştur
+log_model.fit(scaled_X_train, y_train)  # Modeli eğit
+
+📌 Lojistik Regresyon nedir?
+
+Çıktısı 0-1 aralığında bir olasılık verir (Binary Classification için uygun).
+Pokémon’un efsanevi olup olmadığını tahmin etmeye çalışır.
+
+5️⃣ Modelin Katsayılarını Analiz Etme 📊
+log_model.coef_
+🔹 Her özelliğin modele etkisini gösteren katsayıları çıkarır.
+🔹 Katsayılar pozitifse, özellik efsanevi olma olasılığını artırır.
+🔹 Katsayılar negatifse, özellik efsanevi olma olasılığını azaltır.
+
+coef = pd.Series(index=x.columns, data=log_model.coef_[0])
+📌 Seri olarak katsayıları oluşturur ve özellik isimlerini indeks olarak kullanır.
+
+6️⃣ Katsayıları Küçükten Büyüğe Sıralama 📉
+coef.sort_values(inplace=True)
+🔹 Hangi özelliklerin en önemli olduğunu görmek için sıralama yapar
+
+7️⃣ Özelliklerin Etkisini Görselleştirme 🎨
+sns.barplot(x=coef.index, y=coef.values, palette="bright")
+
+📌 Barplot Ne İşe Yarar?
+📊 Özelliklerin model üzerindeki etkisini görselleştirir.
+🎯 En büyük pozitif katsayılar = Efsanevi olmayı en çok etkileyen özellikler
+🔻 En büyük negatif katsayılar = Efsanevi olmamayı etkileyen özellikler
+
+🎯 Özet:
+1️⃣ Veri hazırlanır (Legendary sütunu ayrılır).
+2️⃣ Eğitim ve test setlerine bölünür (%60 train, %40 test).
+3️⃣ Özellikler StandardScaler ile ölçeklendirilir.
+4️⃣ Lojistik regresyon modeli eğitilir.
+5️⃣ Özelliklerin önem derecesi analiz edilir.
+6️⃣ Sonuçlar barplot ile görselleştirilir.
+
+**********************************************************************
+			-- PERFORMANS METRİKLERİ --
+
+📊✨ Lojistik Regresyon Modelinin Performans Analizi! 🚀
+
+🔍 Kod Açıklaması Adım Adım
+
+1️⃣ Performans Ölçümleri İçin Gerekli Kütüphaneleri İçe Aktarma
+
+from sklearn.metrics import accuracy_score, confusion_matrix 
+from sklearn.metrics import ConfusionMatrixDisplay, classification_report
+
+📌 Bu kütüphaneler ne işe yarar?
+accuracy_score → Modelin doğruluk oranını hesaplar. 🎯
+confusion_matrix → Gerçek vs. tahmin edilen değerleri karşılaştıran bir matris oluşturur. 🔢
+ConfusionMatrixDisplay → Karmaşıklık matrisini grafik olarak gösterir. 📊
+classification_report → Precision, recall ve F1-score gibi metrikleri içerir. 📝
+
+# Precision = Benim tahmin ettiklerimden kaçı doğru
+# Recall = Doğru olanlardan ben kaçını tahmin edebildim
+
+2️⃣ Test Verisi Üzerinde Tahmin Yapma
+legend_pred = log_model.predict(scaled_X_test)
+
+📌 Ne yapıyor?
+log_model.predict(scaled_X_test) → Test setindeki Pokémon’lar için efsanevi olup olmadığını tahmin eder.
+Sonuç: legend_pred → 0 (normal Pokémon) veya 1 (efsanevi Pokémon) olarak tahmin edilen değerler
+
+3️⃣ Modelin Doğruluk Oranını Hesaplama
+accuracy_score(y_test, legend_pred)
+
+📌 Doğruluk Oranı (Accuracy Score) Nedir?
+Doğru Tahminler / Bütün Tahminler
+​
+1.0 (100%) → Model tüm tahminleri doğru yapmış 🎯
+0.5 (50%) → Model rastgele tahmin yapıyor olabilir 🤔
+0.0 (0%) → Model tamamen yanlış tahminler yapıyor ❌
+
+4️⃣ Karmaşıklık Matrisi (Confusion Matrix) Oluşturma
+confusion_matrix(y_test, legend_pred)
+
+📌 Karmaşıklık Matrisi Nedir?
+Bir sınıflandırma modelinin doğru ve yanlış tahminlerini tablo halinde gösterir.
+Matris şu şekilde olur:
+
+	   Tahmin Edilen 0	   Tahmin Edilen 1
+Gerçek 0	TN (Doğru Negatif) ✅	FP (Yanlış Pozitif) ❌
+Gerçek 1	FN (Yanlış Negatif) ❌	TP (Doğru Pozitif) ✅
+
+📌 Terimler Açıklaması:
+
+TN (True Negative) → Normal Pokémon’u doğru tahmin etti ✅
+TP (True Positive) → Efsanevi Pokémon’u doğru tahmin etti ✅
+FP (False Positive) → Normal Pokémon’a yanlışlıkla "efsanevi" dedi ❌
+FN (False Negative) → Efsanevi Pokémon’a yanlışlıkla "normal" dedi ❌
+
+******************************************************************* 
+
+print(classification_report(y_test  , legend_pred)) kodu açıklaması ;
+
+
+              precision    recall  f1-score   support
+
+           0       0.85      0.90      0.87       150
+           1       0.88      0.80      0.84       100
+
+    accuracy                           0.86       250
+   macro avg       0.86      0.85      0.85       250
+weighted avg       0.86      0.86      0.86       250
+
+Açıklamalar:
+
+# Precision = Benim tahmin ettiklerimden kaçı doğru
+# Recall = Doğru olanlardan ben kaçını tahmin edebildim
+
+1️⃣ Precision (Hassasiyet) - 🎯
+0 sınıfı için 0.85: "Normal Pokémon" tahminlerinde modelin ne kadar doğru olduğu. Yani, modelin "Normal" dediği Pokémon’ların %85'i gerçekten normal.
+
+1 sınıfı için 0.88: "Efsanevi Pokémon" tahminlerinde modelin ne kadar doğru olduğu. Yani, modelin "Efsanevi" dediği Pokémon’ların %88'i gerçekten efsanevi.
+
+
+2️⃣ Recall (Duyarlılık) - 🔍
+0 sınıfı için 0.90: Gerçek "Normal Pokémon"ların %90'ını doğru tahmin etti. Yani, model normal Pokémon’ları %90 oranında doğru yakaladı.
+
+1 sınıfı için 0.80: Gerçek "Efsanevi Pokémon"ların %80'ini doğru tahmin etti. Yani, model efsanevi Pokémon’ların %80'ini doğru yakaladı.
+
+3️⃣ F1-Score (Harmonik Ortalama) - 
+0 sınıfı için 0.87: Precision ve Recall arasında dengeyi sağlamak için hesaplanan skor. İyi bir dengeyi gösteriyor.
+
+1 sınıfı için 0.84: Efsanevi Pokémon'lar için de benzer şekilde, modelin genel performansını gösteriyor.
+
+4️⃣ Support (Destek) - 💪
+0 için 150: 150 "Normal Pokémon" örneği.
+1 için 100: 100 "Efsanevi Pokémon" örneği.
+
+5️⃣ Accuracy (Doğruluk) - ✅
+0.86: Modelin genel doğruluk oranı. Yani, test verisinin %86’sını doğru tahmin etti.
+
+6️⃣ Macro Average (Makro Ortalama) - 🌐
+0.86: Tüm sınıfların Precision, Recall ve F1 skorlarının ortalamaları, her sınıfa eşit ağırlık verir.
+
+7️⃣ Weighted Average (Ağırlıklı Ortalama) - ⚖️🌍
+0.86: Her sınıfın örnek sayısına göre ağırlıklı ortalama. Bu, modelin genel performansını daha dengeli şekilde ölçer.
+
+🎯 Sonuç:
+Precision ve Recall değerleri, modelin her sınıfı ne kadar doğru tahmin ettiğini gösteriyor.
+F1-Score, Precision ve Recall’un dengeli olup olmadığını gösteriyor.
+Accuracy modelin genel doğruluğunu yansıtıyor.
+
+****************************************************************************************************
+		📊 Yeni Metrikler ile Performans Analizi 📊
+
+1️⃣ Precision-Recall Eğrisi ile Analiz 📉
+
+from sklearn.metrics import PrecisionRecallDisplay
+
+# Precision-Recall eğrisini çizdiriyoruz
+PrecisionRecallDisplay.from_estimator(log_model, scaled_X_test, y_test)
+Precision ve Recall metriklerini daha iyi analiz etmek için Precision-Recall eğrisini çizebiliriz. Bu eğri, modelin farklı karar eşiklerinde precision ve recall değerlerinin nasıl değiştiğini gösterir.
+
+Precision (Hassasiyet): Modelin pozitif tahminlerinden ne kadarının doğru olduğunu gösterir. (Yani, modelin "efsanevi Pokémon" dediği Pokémon'ların ne kadarının gerçekten efsanevi olduğunu gösterir.)
+
+Recall (Duyarlılık): Gerçek pozitif örneklerin ne kadarını doğru tahmin ettiğini gösterir. (Yani, gerçekten efsanevi Pokémon olanlardan modelin kaçını doğru tahmin ettiğini gösterir.)
+
+Bu eğri, modelin ne kadar iyi olduğunu gösterir. Eğrinin sağ üst köşesi, yüksek precision ve recall değerlerini temsil eder, yani model doğru ve çok fazla pozitif tahmin yapıyordur. Daha aşağıda ve sola kayarsa, modelin performansının kötü olduğunu gösterir.
+
+2️⃣ ROC Eğrisi ile Analiz 📊
+
+from sklearn.metrics import RocCurveDisplay
+
+# ROC eğrisini çizdiriyoruz
+RocCurveDisplay.from_estimator(log_model, scaled_X_test, y_test)
+
+ROC Eğrisi (Receiver Operating Characteristic) ve AUC (Area Under the Curve), modelin performansını farklı karar eşiklerinde analiz etmeye olanak tanır.
+
+True Positive Rate (TPR), Recall ile aynıdır ve gerçek pozitif örneklerin doğru tahmin edilme oranıdır.
+False Positive Rate (FPR), gerçek negatif örneklerin yanlışlıkla pozitif olarak tahmin edilme oranıdır.
+ROC Eğrisi, modelin False Positive Rate (FPR) ile True Positive Rate (TPR) arasındaki dengeyi görselleştirir. Eğrinin üst kısmında olmak, modelin iyi performans gösterdiğini ifade eder. AUC (Area Under the Curve) değeri modelin genel doğruluğunu gösterir:
+
+AUC = 1: Mükemmel performans 🎯
+AUC = 0.5: Model rastgele tahmin yapıyor ❌
+AUC < 0.5: Modelin tahminleri çok kötü 🚫
+
+*****************************************************************************************************
+
+5️⃣ Karmaşıklık Matrisini Görselleştirme
+ConfusionMatrixDisplay.from_estimator(log_model, scaled_X_test, y_test)
+
+📌 Ne yapıyor?
+Modelin tahmin ettiği değerler ile gerçek değerleri karşılaştırıyor.
+Matris grafiği olarak gösteriyor, böylece hangi sınıflarda hata yapıldığını daha iyi anlayabiliyoruz. 
+
+🎯 Özet:
+1️⃣ Test verisiyle tahmin yapılır → log_model.predict(scaled_X_test)
+2️⃣ Doğruluk oranı hesaplanır → accuracy_score(y_test, legend_pred)
+3️⃣ Karmaşıklık matrisi oluşturulur → confusion_matrix(y_test, legend_pred)
+4️⃣ Matris grafik olarak görselleştirilir → ConfusionMatrixDisplay.from_estimator(...)
+
+*****************************************************************************************************
+			- 🕹️📊 Yeni Pokémon Tahmin ve Ölçeklendirme - 🕹️📊
+
+poke_1 = [[620 , 150 , 130 , 150 , 170,100,160,2]]
+
+🔢 Pokémon Özellikleri:
+Bu satırda bir Pokémon'un özellikleri liste şeklinde tanımlanıyor. Bu Pokémon’un sayısal verilerini içeriyor.
+
+620: Pokémon'un CP veya toplam gücü. ⚡
+150: Saldırı gücü. ⚔️
+130: Savunma gücü. 🛡️
+150: Hız veya dayanıklılık gibi başka bir özellik. 🚀
+170: Pokémon’un sağlık veya benzeri bir özelliği. ❤️
+100: Diğer bir özellik. 💪
+160: Pokémon’un özel yeteneklerinden biri. 🌟
+2: Pokémon’un sınıfı (efsanevi ya da normal). 🔮
+Bu değerler, Pokémon’un çeşitli niteliklerine ait sayısal özellikler.
+
+
+poke_scaled_1 = scaler.transform(poke_1)
+
+🔧 Ölçeklendirme:
+Burada scaler nesnesi, verinin normalizasyon veya standartlaştırma işlemi için kullanılıyor.
+
+Bu işlem, verilerin farklı ölçeklerde olmasından kaynaklanabilecek hataları engeller.
+scaler.transform(poke_1) komutu, poke_1 listesindeki sayısal verileri eğitim verisinde kullanılan ölçeklendirme yöntemine göre yeniden ölçeklendiriyor. 📉
+
+log_model.predict(poke_scaled_1)
+
+🔮 Tahmin Yapma:
+Sonrasında, log_model isimli lojistik regresyon modelini kullanarak tahmin yapıyorsun.
+
+poke_scaled_1 ile ölçeklendirilmiş olan Pokémon verisi, modelin girdiği ve model tahmin yapıyor.
+Modelin sonucuna göre:
+1 dönerse, Pokémon efsanevi demektir. 🌟
+0 dönerse, Pokémon normal demektir. 🐾
+
+Özet:
+Bu kod, bir Pokémon'un özelliklerini modele verip, efsanevi olup olmadığını tahmin etmek için kullanılıyor. Model, verileri doğru şekilde ölçeklendirip, tahmin sonucunu 0 veya 1 olarak döndürüyor. Eğer model 1 dönerse, Pokémon efsanevi olduğunu belirtiyor! 🎉
+
+*****************************************************************************************************
+
+			- 🧑‍🚀🔮 Pokémon Olasılığı ve Tahmin - 🧑‍🚀🔮
+
+log_model.predict_proba(poke_scaled_1)[0, 1] * 100
+🔍 predict_proba ile Olasılık Hesaplama:
+Bu satırda predict_proba fonksiyonu, Pokémon'un efsanevi olma olasılığını hesaplamak için kullanılıyor.
+
+poke_scaled_1: Bu, daha önce ölçeklendirdiğimiz Pokémon verisidir.
+predict_proba fonksiyonu, modelin her iki sınıf için olasılıklarını döndürüyor. Yani:
+Sınıf 0 (normal Pokémon) olma olasılığı,
+Sınıf 1 (efsanevi Pokémon) olma olasılığı.
+[0, 1]: Bu, efsanevi Pokémon olma olasılığını (1. sınıf) alıyoruz.
+* 100: Olasılığı yüzde cinsinden almak için çarpıyoruz.
+🧑‍🔬 Örnek Durum:
+Eğer bu değer 95 dönerse, bu Pokémon'un efsanevi olma olasılığı %95'tir! 🌟
+
+*****************************************************************************************************
+
+				- 🔍 Yanlış Tahminler Tespiti - 🔍
+
+wrong = (y_test != legend_pred)
+
+❌ Hatalı Tahminlerin Belirlenmesi:
+Bu satır, gerçek sınıf (y_test) ile tahmin edilen sınıf (legend_pred) arasındaki farkları kontrol eder.
+
+True: Yanlış tahmin edilmiş Pokémon.
+False: Doğru tahmin edilmiş Pokémon.
+
+wrong_df = pd.DataFrame(wrong)
+
+📊 Hatalı Tahminleri DataFrame’e Dönüştürme:
+Burada, wrong (yanlış tahminler) bir liste ya da diziyi DataFrame formatına dönüştürüyoruz. Bu, daha kolay analiz yapmamızı sağlar.
+
+
+wrong_df
+
+🔍 Hatalı Tahminlerin Görüntülenmesi:
+Bu satır, yanlış tahmin edilen Pokémon’ları gösterir. False olanlar doğru tahmin edilmiş Pokémon'lardır. 🎯
+
+wrong_df[wrong_df["Legendary"] == True]
+
+💡 Yanlış Tahmin Edilen Pokémon'ları Bulma:
+Bu satırda, yalnızca yanlış tahmin edilen Pokémon’ları filtreliyoruz. Legendary sütununda True olanlar, aslında efsanevi olması gereken Pokémon'lardır, ancak model yanlışlıkla normal olarak sınıflandırmış.
+
+df.loc[[667, 737]]
+
+📜 Yanlış Tahmin Edilen Pokémon’ları Detaylı İnceleme:
+Bu satırda, index 667 ve index 737 olan Pokémon’ların özelliklerini gösteriyoruz. Bu iki Pokémon yanlış tahmin edilenlerdir.
+
+Örnek 1 (Index 667):
+
+Pokémon efsanevi değilmiş, ancak model onu efsanevi olarak tahmin etmiş.
+Özellikler:
+HP: 600
+Attack: 71
+Defense: 120
+Sp. Atk: 95
+Sp. Def: 120
+Speed: 95
+Generation: 5
+Legendary: 0 (efsanevi değil)
+Örnek 2 (Index 737):
+
+Pokémon efsaneviymiş, ancak model onu normal olarak tahmin etmiş.
+Özellikler:
+HP: 600
+Attack: 108
+Defense: 100
+Sp. Atk: 121
+Sp. Def: 81
+Speed: 95
+Generation: 6
+Legendary: 1 (efsanevi)
+
+Özet:
+1️⃣ wrong değişkeni, doğru ve yanlış tahminleri kontrol eder. 2️⃣ wrong_df DataFrame, yanlış tahminlerin listelendiği yer. 3️⃣ Yanlış tahmin edilen Pokémon'lar efsanevi olması gereken ama normal tahmin edilen ve normal olması gereken ama efsanevi tahmin edilen Pokémon'lardır. 4️⃣ Pokémon’ların özellikleri veritabanında detaylıca gösterilir.
+
+
+			------------ GENEL KODLAR --------------
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Veriyi yükleyin
+df = pd.read_csv("pokemon.csv")
+df.head()
+
+# Veride eksik değerler var mı kontrol et
+df.isna().any()
+df.info()
+
+# "Legendary" sütununu 1/0 değerlerine dönüştür
+map_legend = {True: 1, False: 0}
+df["Legendary"] = df["Legendary"].map(map_legend)
+
+# "Type 1" sütunundaki benzersiz değerler
+df["Type 1"].unique()
+df["Type 1"].nunique()
+
+# Gereksiz sütunları çıkar
+df.drop(["#", "Name", "Type 1", "Type 2"], axis=1, inplace=True)
+
+# Verinin dağılımını görselleştirme
+sns.pairplot(df, hue="Legendary")
+plt.figure(figsize=(7, 8))
+sns.heatmap(df.corr(), annot=True)
+
+# Özellikler ve hedef değişken
+x = df.drop("Legendary", axis=1)
+y = df["Legendary"]
+
+# Eğitim ve test verisi olarak ayır
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=9)
+
+# Veriyi standartlaştır
+scaler = StandardScaler()
+scaled_X_train = scaler.fit_transform(X_train)
+scaled_X_test = scaler.transform(X_test)
+
+# Lojistik Regresyon modeli
+from sklearn.linear_model import LogisticRegression
+
+log_model = LogisticRegression()
+log_model.fit(scaled_X_train, y_train)
+
+# Modelin katsayılarını görselleştirme
+coef = pd.Series(index=x.columns, data=log_model.coef_[0])
+coef.sort_values(inplace=True)
+sns.barplot(x=coef.index, y=coef.values, palette="bright")
+
+# Performans değerlendirmesi
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay, classification_report
+
+legend_pred = log_model.predict(scaled_X_test)
+
+# Model doğruluğunu ve sınıflandırma raporunu yazdır
+print(f"Accuracy: {accuracy_score(y_test, legend_pred)}")
+print(classification_report(y_test, legend_pred))
+
+# Konfizyon matrisi
+ConfusionMatrixDisplay.from_estimator(log_model, scaled_X_test, y_test)
+
+# Precision-Recall ve ROC eğrisi
+from sklearn.metrics import PrecisionRecallDisplay, RocCurveDisplay
+PrecisionRecallDisplay.from_estimator(log_model, scaled_X_test, y_test)
+RocCurveDisplay.from_estimator(log_model, scaled_X_test, y_test)
+
+# Yeni bir Pokémon ile tahmin
+poke_1 = [[620, 150, 130, 150, 170, 100, 160, 2]]
+poke_scaled_1 = scaler.transform(poke_1)
+print("Prediction:", log_model.predict(poke_scaled_1))  # Pokémon efsanevi mi?
+print("Probability:", log_model.predict_proba(poke_scaled_1)[0, 1] * 100)  # Pokémon efsanevi olma olasılığı
+
+# Hatalı tahminler
+wrong = (y_test != legend_pred)
+wrong_df = pd.DataFrame(wrong)
+wrong_df[wrong_df["Legendary"] == True]  # Yanlış tahmin edilen efsanevi Pokémon'lar
+df.loc[[667, 737]]  # Yanlış tahminler üzerinde analiz
+
+
+
+
+
+
+
+
+		

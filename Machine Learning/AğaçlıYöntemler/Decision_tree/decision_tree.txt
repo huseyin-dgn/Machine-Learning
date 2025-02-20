@@ -1,0 +1,565 @@
+				🌳 Decision Tree Nedir?
+
+Bir problemi çözmek için dallara ayrılarak kararlar alan bir yapay zeka algoritmasıdır. Her bir düğümde (node) bir soru sorulur ve cevaba göre farklı dallara (branches) ayrılır. 🌿
+
+📊 Nasıl Çalışır?
+
+🟡 Kök Düğüm (Root Node):  Karar ağacının başlangıç noktasıdır.
+🛤️ Dallar (Branches): Verinin cevabına göre farklı yollara ayrılır.
+🟢 Yaprak Düğümler (Leaf Nodes): Sonuçların bulunduğu düğümlerdir.
+💡 Örnek:
+Diyelim ki birisi futbol oynayacak mı kararını veriyoruz:
+
+🌞 Hava güneşliyse → Evet ⚽
+🌧️ Yağmurluysa → Hayır ☔
+☁️ Bulutluysa → Belki 🤷
+📌 Avantajları:
+✅ Kolay anlaşılır ve görselleştirilebilir 🧩
+✅ Hem sınıflandırma hem regresyon için kullanılabilir 🧠
+
+⚠️ Dezavantajları:
+❌ Overfitting (Aşırı öğrenme) riski var 🚨
+❌ Karışık veriyle fazla büyüyebilir 🌪️
+
+🌟 Sonuç:
+Decision Tree, basit ve güçlü bir algoritmadır. Hem hızlı çalışır hem de mantığı anlaşılır. Özellikle başlangıç seviyesinde makine öğrenmesi için idealdir! 🤖💯
+
+				💯 BASAMAKLAR 💯
+1️⃣ Veri Ön İşleme (Data Preprocessing)
+2️⃣ Veri Keşfi ve Görselleştirme (EDA)
+3️⃣ Korelasyon Analizi (Correlation Analysis)
+4️⃣ Veri Dönüşümü (Data Transformation)
+5️⃣ Train-Test Ayrımı (Train-Test Split)
+6️⃣ Karar Ağacı Modeli (Decision Tree Model)
+7️⃣ Model Değerlendirme (Model Evaluation)
+8️⃣ Model Optimizasyonu (Model Optimization)
+9️⃣ Fonksiyon ile Model Değerlendirme (Function for Model Evaluation)
+🔟 Derinlik Sınırlaması ile Model (Max Depth Model)
+1️⃣1️⃣ Yaprak Sayısı Sınırlaması ile Model (Max Leaf Nodes Model)
+1️⃣2️⃣ Entropi ile Model (Entropy Criterion Model)
+
+
+## Eksik Veriler
+df.info()
+df.isnull().sum()
+df.dropna(inplace=True) # Null olanları sil.
+df.isnull().sum()
+df["species"].unique()
+df["island"].unique()
+df["sex"].unique()
+df[df["sex"] == "."] # Değeri karşımıza çıkardı.
+df = df[df["sex"] != "."] 
+df[df["sex"] == "."] # Değeri karşımıza çıkardı.
+df.describe()
+
+⚠️Burada yapılan işlemler hakkında bilgimiz olduğundan yalnızca bu şekilde bir açıklama yapıyorum ⚠️
+
+			🖼️ Görselleştirmeler (Visualizations) 🖼️	
+
+1️⃣ Türlerin Dağılımı (Species Distribution):
+
+sns.countplot(x="species" , data=df)
+Amaç: Veri setindeki penguen türlerinin sayısını gösterir. 📊
+Çıktı: Türlerin (Adelie, Chinstrap, Gentoo) dağılımı çubuk grafiğiyle gösterilir.
+
+2️⃣ Flipper Uzunluğu ve Vücut Ağırlığı İlişkisi:
+
+sns.scatterplot(x="flipper_length_mm" , y="body_mass_g" , data=df, hue="species")
+Amaç: Flipper uzunluğu ile vücut ağırlığı arasındaki ilişkiyi görselleştirir. 📈
+Çıktı: Türlere göre renklenen noktalar, grupların nasıl ayrıldığını gösterir.
+
+3️⃣ Gaga Uzunluğu ve Gaga Derinliği İlişkisi:
+
+sns.scatterplot(x="culmen_length_mm" , y="culmen_depth_mm" , data=df, hue="species")
+Amaç: Gaga uzunluğu ve derinliği arasındaki ilişkiyi türlere göre analiz eder. 🐧
+Çıktı: Bazı türlerin gaga ölçümleriyle kolayca ayrıştığı gözlemlenir.
+
+4️⃣ Gaga Uzunluğu Dağılımı (Cinsiyete Göre):
+
+sns.boxplot(x="species" , y="culmen_length_mm", data=df ,hue="sex")
+Amaç: Cinsiyet farkının gaga uzunluğuna etkisini gösterir. 📦
+Çıktı: Erkek ve dişi penguenlerin gaga uzunluğu karşılaştırılır.
+
+5️⃣ Çift Değişken İlişkileri (Pairplot):
+
+sns.pairplot(data=df , hue="species")
+Amaç: Tüm sayısal değişkenler arasındaki ilişkileri tek bir grafikte gösterir. 🔍
+Çıktı: Türlere göre ayrışma olup olmadığı gözlemlenir.
+
+6️⃣ Korelasyon Isı Haritası (Correlation Heatmap):
+
+sns.heatmap(df.corr(numeric_only=True) , annot=True)
+Amaç: Sayısal değişkenler arasındaki ilişkinin gücünü gösterir. 🔥
+Çıktı: Değişkenler arasındaki pozitif ve negatif ilişkiler ısı haritasında gösterilir.
+# numeric_only : Dataframe de olan bir hata sonucu yalnızca sayısal değerleri aldık.
+
+7️⃣ Karar Ağacı Çizimi (Decision Tree Plot):
+
+plot_tree(model , filled=True, feature_names=x.columns)
+Amaç: Karar ağacının nasıl dallandığını ve hangi değişkenlere dayandığını görselleştirir. 🌳
+Çıktı: Karar sürecini şematik olarak gösterir.
+İstersen her bir görselleştirmenin çıktısını nasıl yorumlayacağını da anlatabilirim. 📊✨
+
+			📊 Eğitim ve Test Setine Ayırma (Train-Test Split) 📊
+
+Train test işlemine geçmeden önce bazı konulara değinelim.3 adet fonksiyonumuz var ve bu fonksiyonlar hakkında genel açıklamalar yapalım.
+
+🔄 - get_dummies(), LabelEncoder(), OneHotEncoder() -  🤔
+
+Bu üç fonksiyon da kategorik verileri sayısal verilere dönüştürmek için kullanılır, ancak her birinin farklı kullanım şekilleri ve avantajları vardır. Şimdi bunları inceleyelim:
+
+1️⃣ get_dummies()
+Açıklama: Pandas kütüphanesinin sağladığı bir fonksiyondur.
+Kullanım: One-Hot Encoding uygular, yani her kategoriyi bir sütuna dönüştürür ve 0/1 değeri ile kodlar.
+Özellik: Kategorinin tüm farklı değerleri için yeni sütunlar oluşturur.
+
+✨ pd.get_dummies(df.drop("species", axis=1), drop_first=True) ✨
+
+Parametreler:
+1️⃣ df.drop("species", axis=1)
+
+Amaç: species sütununu veri çerçevesinden çıkarır.
+axis=1 ile sütun silinir (satır silmek için axis=0 kullanılır).
+2️⃣ drop_first=True
+
+Amaç: İlk kategorik sütunu düşürür.
+Neden? Dummy variable trap'i (çoklu doğrusal bağımlılık) engellemek için, modelin sadece gerekli sütunları öğrenmesini sağlar.
+
+
+Örnek:
+
+island = ['Biscoe', 'Dream', 'Torgersen']
+island_Biscoe  island_Dream  island_Torgersen  
+1               0              0  
+0               1              0  
+0               0              1
+
+2️⃣ LabelEncoder()
+Açıklama: Scikit-learn kütüphanesinden gelir ve kategorik verileri tek bir sayıya dönüştürür.
+Kullanım: Ordinal Encoding uygular, yani her kategoriye sırasıyla bir sayı atar.
+Özellik: Sadece tek sütun ile çalışır, kategorik değerlerin sırasız olduğu durumlarda yanlış sonuç verebilir.
+
+
+from sklearn.preprocessing import LabelEncoder
+data = ['Biscoe', 'Dream', 'Torgersen', 'Dream', 'Biscoe']
+
+# LabelEncoder objesi oluştur
+label_encoder = LabelEncoder()
+
+# Kategorileri sayılara dönüştür
+encoded_data = label_encoder.fit_transform(data)
+
+print("Orijinal Veri:", data)
+print("Sayısal Veriye Dönüştürülmüş:", encoded_data)
+
+Örnek:
+
+island = ['Biscoe', 'Dream', 'Torgersen']
+Sonuç:
+island = [0, 1, 2]  
+Biscoe → 0, Dream → 1, Torgersen → 2 gibi.
+
+3️⃣ OneHotEncoder()
+Açıklama: Scikit-learn kütüphanesinde bulunan bir fonksiyondur ve One-Hot Encoding uygular.
+Kullanım: Kategorik veriyi sütun bazında kodlamak için kullanılır. Pandas get_dummies() ile benzer işlevi görür, ancak genellikle veriler sparse matrix (seyrek matris) şeklinde döndürülür.
+Özellik: Daha esnek ve genişletilebilir bir yapıya sahiptir, ancak dönüşüm sonrası çıkan veri tipinin yönetilmesi gerekebilir.
+
+from sklearn.preprocessing import OneHotEncoder
+import numpy as np
+
+# Örnek veri
+data = np.array(['Biscoe', 'Dream', 'Torgersen', 'Dream', 'Biscoe']).reshape(-1, 1)
+
+# OneHotEncoder objesi oluştur
+onehot_encoder = OneHotEncoder(sparse=False)
+
+# Kategorileri One-Hot Encoding ile dönüştür
+encoded_data = onehot_encoder.fit_transform(data)
+
+print("Orijinal Veri:", data.flatten())
+print("One-Hot Encoded Veri:\n", encoded_data)
+
+Örnek:
+
+island = ['Biscoe', 'Dream', 'Torgersen']
+Sonuç:
+[[1, 0, 0],  
+ [0, 1, 0],  
+ [0, 0, 1]]
+
+
+🔥 Farklar ve Kullanım Durumları 🔥
+get_dummies(): Kolay kullanım ve hızlı çözüm sağlar. Genelde pandas ile veri işleme sırasında tercih edilir.
+
+LabelEncoder(): Sadece tek sütun için uygundur, sırasız kategorilerde problem yaratabilir. Genelde etiketli veriler için kullanılır.
+
+OneHotEncoder(): Daha esnek ve sparse matrix formatı ile çalışır. Büyük veri setlerinde ve Scikit-learn ile modeller oluştururken kullanılır.
+
+Özet:
+Her üçü de kategorik verileri sayısal verilere dönüştürür, fakat kullanıldıkları yerler ve sağladıkları dönüşüm şekilleri farklıdır. get_dummies() ve OneHotEncoder() aynı işlevi görürken, LabelEncoder() daha farklı bir yaklaşımla veriyi dönüştürür.
+
+		📊 TRAİN TEST SPLİT İŞLEMİNE DEVAM EDELİM 📊
+
+x= pd.get_dummies(df.drop("species",axis =1), drop_first=True )
+y= df["species"]
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split( x, y, test_size=0.3, random_state=9)
+
+Bu yapılan işlemler dersimizin başından beri anlatılan işlemler olduğundan , genel açıklamalara yer vermedim. Şimdi Karar Verme Ağacı Modeli'ni inceleyelim.
+
+				🌳 Karar Verme Ağacı Modeli 🌳
+
+Model Tanımlaması 🛠️:
+
+DecisionTreeClassifier(): Karar verme ağacı sınıflandırma modelini oluşturur.
+Bu model, verileri ağaç yapısında bölerek sınıflandırır.
+
+Modeli Eğitim Verisiyle Eğitme 📚:
+
+model.fit(X_train, y_train): Modeli eğitim verisiyle eğitir.
+X_train: Eğitim setinin özellikleri (veri).
+y_train: Eğitim setinin etiketleri (hedef).
+
+Tahmin Yapma 🔮:
+
+pengu_pred = model.predict(X_test): Model, test verisiyle tahmin yapar.
+Sonuçları pengu_pred değişkeninde saklar.
+📈 Özet:
+Model eğitilir ve test verisiyle tahmin yapılır. Model, verileri ağaç şeklinde bölerek kararlar alır. 
+
+## Karar verme ağacı modeli ## 
+ 
+from sklearn.tree import DecisionTreeClassifier
+model= DecisionTreeClassifier()#random_state kullanılabilir.)
+model.fit(X_train , y_train)
+pengu_pred = model.predict(X_test)
+
+📚 📚 Özet 📚 📚
+
+Modeli tanımlarız → DecisionTreeClassifier()
+Eğitim verisiyle eğitiriz → model.fit(X_train, y_train)
+Test verisiyle tahmin yaparız → pengu_pred = model.predict(X_test)
+
+			🔍 Model Değerlendirmesi 🔍
+
+📊 Karışıklık Matrisi (Confusion Matrix) 📊
+
+confusion_matrix(): Modelin tahminlerinin doğruluğunu görsel olarak gösterir. Gerçek ve tahmin edilen etiketlerin karşılaştırıldığı bir matris oluşturur.
+ConfusionMatrixDisplay.from_estimator(): Karışıklık matrisini görsel olarak model üzerinden görüntüler.
+
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+# Karışıklık Matrisini Görselleştir
+ConfusionMatrixDisplay.from_estimator(model, X_test, y_test)
+
+📑 Sınıflandırma Raporu (Classification Report) 📑
+
+classification_report(): Modelin precision, recall, f1-score gibi değerlendirme metriklerini hesaplar. Bu metrikler, modelin her sınıf için nasıl performans gösterdiğini gösterir.
+
+from sklearn.metrics import classification_report
+
+# Sınıflandırma Raporunu Yazdır
+print(classification_report(y_test, pengu_pred))
+
+🔑 Özellik Önem Dereceleri (Feature Importance) 🔑
+
+model.feature_importances_: Karar verme ağacındaki her bir özelliğin model tarafından ne kadar önemli olduğunu gösterir.
+Bu özellikler, modelin kararlarını vermesinde ne kadar etkili olduğunu belirtir.
+
+# Özelliklerin Önem Derecelerini Görüntüle
+print(model.feature_importances_)
+
+📊 Özelliklerin Önem Derecelerini Görselleştirme 📊
+
+pd.DataFrame(): Özelliklerin önem derecelerini veri çerçevesi (DataFrame) olarak gösterir. Her özelliğin modeldeki önemini daha net görmemizi sağlar.
+
+import pandas as pd
+
+# Özelliklerin Önem Derecelerini Görselleştir
+pd.DataFrame(index=X.columns, data=model.feature_importances_, columns=["Katsayılar"])
+
+📚 📚 Özet 📚 📚
+
+Karışıklık Matrisini görselleştirerek modelin doğruluğunu inceliyoruz.
+Sınıflandırma raporunu yazdırarak modelin performansını daha detaylı değerlendiriyoruz.
+Özelliklerin önem derecelerini öğrenerek modelin hangi özelliklere odaklandığını analiz ediyoruz.
+
+
+Burda yapılan işlemler logistic regresyon tanımında da işimize yaramıştı.
+
+		🔍 Karar Verme Ağacı Modelinin İncelenmesi ve Optimizasyonu 🌳
+
+ 1️⃣ Karar Verme Ağacının Görselleştirilmesi 🌳
+
+plot_tree()
+Karar verme ağacını görselleştiren fonksiyondur. Bu fonksiyon, modelin yapısını ağaç şeklinde çizmenizi sağlar. Ağacın her dalı bir özellik (feature), her yaprak ise bir sonuç (class label) temsil eder.
+
+from sklearn.tree import plot_tree
+
+# İlk görselleştirme: Grafik boyutunu ayarlayarak ağacı çiz
+plt.figure(figsize=(10,8))
+plot_tree(model)
+
+# İkinci görselleştirme: Daha yüksek çözünürlük ve daha büyük boyutla ağacı çiz
+plt.figure(figsize=(12,8), dpi=200)
+plot_tree(model, filled=True, feature_names=x.columns)
+Parametreler:
+
+model: Karar ağacınız.
+figsize: Grafik boyutunu ayarlamak için kullanılır.
+dpi: Çözünürlüğü ayarlamak için kullanılır.
+filled=True: Ağacın düğümlerini renkli doldurur, hangi sınıfın hakim olduğunu gösterir.
+feature_names: Özelliklerin adlarını kullanarak ağacı etiketler.
+
+2️⃣ Fonksiyon Oluşturma (Model Sonuçlarını Görselleştirme ve Değerlendirme) 📈
+
+model_sonuc()
+Bu fonksiyon, modelin tahminini yapar, değerlendirme metriklerini yazdırır ve karar ağacını görselleştirir. Fonksiyon, karar ağacının çeşitli versiyonlarını değerlendirmemize yardımcı olur.
+
+def model_sonuc(model):
+    # Modeli test verisiyle tahmin yapacak şekilde kullan
+    pengu_pred = model.predict(X_test)
+    
+    # Karışıklık matrisini görselleştir
+    ConfusionMatrixDisplay.from_estimator(model, X_test, y_test)
+    
+    # Sınıflandırma raporunu yazdır
+    print(classification_report(y_test, pengu_pred))
+    
+    # Karar ağacını görselleştir
+    plt.figure(figsize=(12,8), dpi=200)
+    plot_tree(model, filled=True, feature_names=x.columns)
+
+Parametreler:
+
+model: Eğitilmiş karar ağacı modelini alır.
+
+pengu_pred: Test verisi üzerinde tahmin yapılan sonuçları tutar.
+
+ConfusionMatrixDisplay.from_estimator(): Modelin doğruluğunu görselleştiren karışıklık matrisini gösterir.
+
+classification_report(): Modelin performansını precision, recall, f1-score gibi metriklerle değerlendirir.
+
+plot_tree(): Karar ağacını görselleştirir.
+
+3️⃣ Az Derinlikli Karar Ağacı (Pruning) 🍃
+
+max_depth=2
+Karar ağacının derinliğini sınırlamak için kullanılır. Derinlik arttıkça modelin karmaşıklığı ve aşırı uyum yapma (overfitting) ihtimali artar. Bu parametre, ağacın daha basit hale gelmesini sağlar.
+
+az_agac = DecisionTreeClassifier(max_depth=2)
+az_agac.fit(X_train, y_train)
+model_sonuc(az_agac)
+
+Parametreler:
+
+max_depth=2: Karar ağacının derinliğini 2 ile sınırlıyoruz. Bu, ağacın fazla karmaşıklaşmasını önler.
+
+4️⃣ Az Yapraklı Karar Ağacı 🍂
+
+max_leaf_nodes=5
+Bu parametre, ağacın sahip olacağı maksimum yaprak (sonuç) sayısını sınırlamak için kullanılır. Ağacın daha basit ve genellenebilir olmasını sağlar.
+
+az_yaprak = DecisionTreeClassifier(max_leaf_nodes=5)
+az_yaprak.fit(X_train, y_train)
+model_sonuc(az_yaprak)
+Parametreler:
+
+max_leaf_nodes=5: Ağacın en fazla 5 yaprağa sahip olmasını sağlar. Bu da modelin daha basit olmasına yardımcı olur.
+
+5️⃣ Karar Ağacının Optimizasyonu (Entropy Kullanımı) ⚙️
+
+criterion="entropy"
+Bu parametre, karar ağacının nasıl oluşturulacağını belirler. "entropy" kriteri, bilgiyi kazancı en yüksek olan bölmeleri seçer. Diğer seçenek ise "gini" dir, bu da daha hızlı çalışabilir ancak bazı durumlarda daha az doğru olabilir.
+
+entropi = DecisionTreeClassifier(criterion="entropy")
+entropi.fit(X_train, y_train)
+model_sonuc(entropi)
+Parametreler:
+
+criterion="entropy": Bu parametre, karar ağacının oluşumunda kullanılan ölçümdür. Entropy (bilgi kazanımı) kullanılarak ağacın bölünmesi sağlanır.
+
+📚 📚 Özet 📚 📚
+
+plot_tree(): Karar ağacını görselleştirir.
+model_sonuc(): Modelin performansını değerlendirir, karışıklık matrisi ve sınıflandırma raporu sağlar.
+max_depth ve max_leaf_nodes: Modelin karmaşıklığını kontrol eder, aşırı uyumu engeller.
+criterion="entropy": Karar ağacının bilgi kazanımını optimize eder.
+
+	   🧠💡 Karar Ağaçları: Entropi ve Gini Kriterleri ile Veri Kümesi Bölme 🧠💡
+
+
+Karar ağacı oluştururken, modelin nasıl bölüneceğini belirlemek için kullanılan farklı kriterler vardır. İki yaygın kriter "entropy" ve **"gini"**dir. Bunlar, ağacın dallanmasında kullanılan matematiksel ölçütlerdir. İşte bu kriterlerin açıklamaları:
+
+1️⃣ Entropy (Bilgi Kazancı)
+Açıklama: Entropi, veri kümesindeki belirsizliği ölçer. Entropi değerinin düşük olması, veri kümesinin daha homojen olduğu anlamına gelir. Yüksek entropi ise daha fazla çeşitlilik ve belirsizlik içerdiğini gösterir. Karar ağacı, her bir düğümde entropiyi minimize ederek daha homojen gruplar elde etmeye çalışır.
+
+
+Avantajları:
+
+Genellikle daha doğru sonuçlar verir.
+Verinin içindeki tüm çeşitliliği dikkate alır.
+
+Dezavantajları:
+
+Hesaplama açısından biraz daha yavaş olabilir, çünkü daha karmaşık bir hesaplama gerektirir.
+
+2️⃣ Gini Impurity (Gini Safsızlığı)
+
+Açıklama: Gini, her iki sınıfın da birbirine karışma olasılığını ölçen bir ölçüttür. Yüksek Gini değeri, verinin daha karışık olduğunu gösterirken, düşük bir Gini değeri veri kümesinin daha saf olduğunu gösterir. Bu metrik, veri kümesini daha homojen gruplara ayırmak için kullanılır.
+
+Avantajları:
+
+Daha hızlı hesaplanır, bu nedenle büyük veri setlerinde daha verimli olabilir.
+Genellikle hızlı ve etkili sonuçlar sağlar.
+
+Dezavantajları:
+
+Entropi kadar hassas olmayabilir, özellikle karmaşık verilerde.
+
+3️⃣ Best Split
+
+Açıklama: Bu kriter, verilen her özellik için veri kümesinin en iyi şekilde nasıl bölüneceğine karar verir. En iyi bölme, veri kümesindeki entropi veya Gini impurity değerini minimize eden bölme olarak kabul edilir.
+Avantajları:
+Basit ve genellikle anlaşılır sonuçlar elde edilir.
+
+
+		🌳 Karar Verme Ağaçlarının Diğer Yöntemlerden Farkı 🌳
+
+1️⃣ Hikayeye Dayalı Modelleme (Yorumlanabilirlik) 💬
+Logistic Regression ve Linear Regression gibi yöntemler, doğrusal ilişkileri modellemek için kullanılır. Yani, bu modellerde bağımsız değişkenlerin (features) bağımlı değişkenle olan ilişkisi bir doğru ile temsil edilir. Bu tür modeller genellikle daha basit ve sayısal çözümler sunar.
+Karar Ağaçları ise çok daha yorumlanabilir ve görselleştirilebilir. Her bir dallanma, bir soruyu temsil eder ve bu sorulara verdiğimiz yanıtlar (evet/hayır) kararları belirler. Bu yüzden karar ağacının çıktıları bir "karar verme süreci" gibi görülebilir. Yani, modelin nasıl çalıştığını kolayca açıklayabilirsiniz.
+
+2️⃣ Non-lineer İlişkiler 🌐
+Logistic regression ve linear regression gibi yöntemler, doğrusal ilişkiler üzerine çalışır. Yani, bağımsız değişkenler ile bağımlı değişken arasındaki ilişki bir düz çizgi ile modellenir.
+Karar Ağaçları, non-lineer ilişkileri modellemek konusunda çok daha güçlüdür. Yani, bir değişkenin diğerine etkisi doğrusal olmayabilir, ve karar ağaçları bu tür karmaşık ilişkileri çok kolay bir şekilde yakalayabilir.
+
+3️⃣ Özellik Seçimi ve Önem Derecesi (Feature Importance) 🔍
+Diğer bazı modellerde, özelliklerin model üzerindeki etkisini anlamak zor olabilir. Örneğin, logistic regression'da p-değerleri ile anlamlılık kontrol edilir, ancak özelliklerin önem derecelerini doğrudan göremeyebilirsiniz.
+Karar Ağaçları ise, her bir özelliği ağaç yapısında dallanma noktası olarak gösterdiği için, hangi özelliklerin karar üzerinde daha fazla etkisi olduğunu açıkça görebiliriz. Bu özelliklerin önem derecelerini de feature importance ile değerlendirebiliriz.
+
+4️⃣ Veri Preprocessing ve Özellik Dönüşümü 🔄
+Logistic regression ve linear regression gibi doğrusal modeller, genellikle verilerin normalizasyonu, kategorik değişkenlerin encoding işlemleri gibi ekstra adımlar gerektirir.
+Karar Ağaçları bu işlemlere çok daha dayanıklıdır. Örneğin, kategorik değişkenler (örneğin "island" veya "sex") doğrudan kullanılabilir ve normalizasyon gerekmez. Karar ağaçları veriyi olduğu gibi işleyebilir.
+
+5️⃣ Aşırı Uyum (Overfitting) 🌪️
+Logistic regression gibi yöntemler daha az parametre içerdiği için aşırı uyum riski daha düşüktür, fakat çok karmaşık verilerle çalışırken doğrusal olmayan ilişkiler yeterince iyi yakalanamayabilir.
+Karar Ağaçları, doğru şekilde yapılandırılmadığında aşırı uyum yapma riski taşıyabilir. Ancak, derinlik (depth) veya yaprak sayısı gibi parametrelerle bu riski kontrol altına almak mümkündür.
+
+📊📊📊 Özetle 📊📊📊;
+
+Logistic regression gibi modeller doğrusal ilişkiler kurarken, karar ağaçları daha esnek ve non-lineer ilişkileri modelleyebilir.
+Karar ağaçları yorumlanabilirliği arttırır ve görselleştirilmesi daha kolaydır. Ayrıca, hangi özelliklerin daha önemli olduğunu net bir şekilde belirlemek mümkündür.
+Sonuç olarak, karar ağaçları genellikle karmaşık ve çok değişkenli verilerle çalışırken tercih edilir, çünkü ilişkiler doğrusal olmayan durumları daha iyi öğrenebilirler.
+
+	🪵 Karar Verme Ağaçları (Decision Trees) ile Modelleme ve Görselleştirme 🪵
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Veriyi oku
+df = pd.read_csv("penguins.csv")
+df.head()
+
+# Eksik verileri kontrol et ve temizle
+df.info()
+df.isnull().sum()
+df.dropna(inplace=True)
+
+# Kategorik değişkenleri kontrol et
+df["species"].unique()
+df["island"].unique()
+df["sex"].unique()
+
+# sex sütununda eksik veriyi temizle
+df = df[df["sex"] != "."]
+df.describe()
+
+# Görselleştirmeler
+sns.countplot(x="species", data=df)
+sns.scatterplot(x="flipper_length_mm", y="body_mass_g", data=df, hue="species")
+sns.scatterplot(x="culmen_length_mm", y="culmen_depth_mm", data=df, hue="species")
+sns.boxplot(x="species", y="culmen_length_mm", data=df, hue="sex")
+sns.heatmap(df.corr(numeric_only=True), annot=True)
+
+# Veri dönüşümü (One-Hot Encoding)
+x = pd.get_dummies(df.drop("species", axis=1), drop_first=True)
+y = df["species"]
+
+# Eğitim ve test setine ayırma
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=9)
+
+# Karar verme ağacı modeli
+from sklearn.tree import DecisionTreeClassifier
+model = DecisionTreeClassifier(random_state=9)
+model.fit(X_train, y_train)
+
+# Test setiyle tahmin yap
+pengu_pred = model.predict(X_test)
+
+# Model Değerlendirme
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report
+confusion_matrix(y_test, pengu_pred)
+ConfusionMatrixDisplay.from_estimator(model, X_test, y_test)
+print(classification_report(y_test, pengu_pred))
+
+# Özelliklerin önemini göster
+model.feature_importances_
+pd.DataFrame(index=x.columns, data=model.feature_importances_, columns=["Katsayılar"])
+
+# Karar ağacını görselleştir
+from sklearn.tree import plot_tree
+plt.figure(figsize=(10, 8))
+plot_tree(model)
+
+plt.figure(figsize=(12, 8), dpi=200)
+plot_tree(model, filled=True, feature_names=x.columns)
+
+# Model Sonuçlarını Fonksiyon Haline Getirme
+def model_sonuc(model):
+    pengu_pred = model.predict(X_test)
+    ConfusionMatrixDisplay.from_estimator(model, X_test, y_test)
+    print(classification_report(y_test, pengu_pred))
+    plt.figure(figsize=(12, 8), dpi=200)
+    plot_tree(model, filled=True, feature_names=x.columns)
+
+# Az Derin Ağaç
+az_agac = DecisionTreeClassifier(max_depth=2)
+az_agac.fit(X_train, y_train)
+model_sonuc(az_agac)
+
+# Az Yapraklı Ağaç
+az_yaprak = DecisionTreeClassifier(max_leaf_nodes=5)
+az_yaprak.fit(X_train, y_train)
+model_sonuc(az_yaprak)
+
+# Optimizasyon (Entropi)
+entropi = DecisionTreeClassifier(criterion="entropy")
+entropi.fit(X_train, y_train)
+model_sonuc(entropi)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

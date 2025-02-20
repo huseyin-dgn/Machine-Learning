@@ -1,0 +1,558 @@
+		--  MULTICLASS LOGISTIC REGRESYON -- 
+
+Multi-class logistic regression, bir verinin hangi sınıfa ait olduğunu belirlemek için kullanılır. İşte bazı kullanım alanları:
+
+📷 Görüntü Sınıflandırma 🐶🐱🐦 (Bir fotoğraftaki objenin kedi, köpek veya kuş olup olmadığını tahmin eder.)
+
+🔠 El Yazısı Tanıma ✍️📖 (Bir harfin "A", "B" veya "C" olduğunu belirler.)
+
+🎵 Müzik Türü Tanıma 🎸🎶🎻 (Bir şarkının rock, pop veya klasik müzik türünde olup olmadığını bulur.)
+
+📧 E-posta Sınıflandırma 📩⚠️🗑️ (Bir e-postanın spam, önemli veya promosyon olup olmadığını belirler.)
+
+⚽ Spor Tahminleri 🏀⚾⚽ (Bir maçın sonucunu veya takımın performansını tahmin edebilir.)
+
+Kısacası, veriyi analiz edip, en uygun sınıfa atayan bir algoritmadır! 🤖🎯
+
+*****************************************************************************
+
+		📊 Multi-Class Logistic Regression 📊
+
+1️⃣ Girdi Verisi (Input Data) 🏠🚗🐶📷 (Farklı kategorilere ait veriler var)
+2️⃣ Özellik Çıkartma (Feature Extraction) 🔍📈 (Veriler sayısal hale getiriliyor)
+3️⃣ Model Eğitimi (Training the Model) 🧠➡️🔄 (Model, hangi verinin hangi sınıfa ait olduğunu öğreniyor)
+4️⃣ Olasılık Hesaplama (Probability Calculation) 🎲📉 (Her sınıfa ait olasılıklar hesaplanıyor, toplamı 1 olacak şekilde)
+5️⃣ Tahmin (Prediction) 🎯🤖 (Veri, en yüksek olasılığı olan sınıfa atanıyor!)
+
+Özetle, multi-class logistic regression, bir nesnenin birden fazla sınıftan birine ait olup olmadığını olasılıklarla hesaplayan bir makine öğrenmesi algoritmasıdır! 
+
+*****************************************************************************
+🎣 Multi-Class Logistic Regression ile Fish DataFrame Analizi 🎣
+
+📥 Veriyi Yükleyelim
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Veri setini içe aktaralım
+df = pd.read_csv("Fish.csv")
+
+# İlk beş satırı görelim
+df.head()
+
+🧐 Veri Setini Tanıyalım
+# Veri hakkında genel bilgiler
+df.info()
+
+# İstatistiksel özet
+df.describe()
+
+🎯 Tahmin Edilecek Kolon: "Species"
+
+df["Species"].unique()
+📌 Bu komut, veri setindeki tüm balık türlerini gösterir.
+
+Her Türden Kaç Tane Var?
+
+df["Species"].value_counts()
+📌 Balık türlerinin dağılımını sayısal olarak gösterir.
+
+📊 Verileri Görselleştirelim
+
+1️⃣ Balık Türlerinin Dağılım Grafiği
+sns.countplot(x=df["Species"])
+plt.xticks(rotation=45)
+plt.title("Balık Türlerinin Dağılımı")
+plt.show()
+
+2️⃣ Ağırlık ve Yükseklik Dağılımı
+sns.scatterplot(x="Weight", y="Height", data=df, hue="Species")
+plt.title("Ağırlık - Yükseklik Dağılımı")
+plt.show()
+
+3️⃣ Bütün Dağılımlara Bakalım
+sns.pairplot(df, hue="Species")
+plt.show()
+📌 Tüm değişkenler arasındaki ilişkiyi incelememizi sağlar.
+
+4️⃣ Korelasyon Haritası (Heatmap)
+sns.heatmap(df.select_dtypes(include=[np.number]).corr(), annot=True, cmap="coolwarm", linewidths=0.5)
+plt.title("Özellikler Arasındaki Korelasyon")
+plt.show()
+
+📌 Sayısal değişkenler arasındaki ilişkileri inceleriz. Yüksek korelasyon, değişkenler arasında güçlü bir ilişki olduğunu gösterir.
+
+*****************************************************************************
+🔄 Train-Test Split İşlemi & Veriyi Ölçeklendirme
+
+📌 Hedef Değişken ve Özelliklerin Ayrılması
+"Species" kolonunu tahmin etmeye çalıştığımız için bağımsız değişkenleri (X) ve bağımlı değişkeni (y) ayıralım:
+
+# X: Bağımsız değişkenler (Species kolonu hariç tüm özellikler)
+x = df.drop("Species", axis=1)
+
+# y: Bağımlı değişken (Tahmin edeceğimiz balık türü)
+y = df["Species"]
+
+✂️ Veriyi Eğitim ve Test Olarak Ayırma
+from sklearn.model_selection import train_test_split
+
+# %70 eğitim, %30 test olarak bölme işlemi
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=9)
+
+📌 Veriyi ayırırken random_state=9 kullanarak sonuçların tutarlı olmasını sağlıyoruz.
+
+⚖️ Veriyi Ölçeklendirme (Standardizasyon)
+from sklearn.preprocessing import StandardScaler
+
+# StandardScaler nesnesini oluştur
+scaler = StandardScaler()
+
+# Eğitim verisini fit & transform et
+scaled_X_train = scaler.fit_transform(X_train)
+
+# Test verisini transform et
+scaled_X_test = scaler.transform(X_test)
+
+📌 Bu işlem, veriyi ortalaması 0, standart sapması 1 olacak şekilde ölçeklendirir. Modelin daha iyi öğrenmesine yardımcı olur.
+
+🚀 Bir sonraki adım: Modeli oluşturup eğitmeye geçebiliriz! 🎯
+
+
+*****************************************************************************
+
+🤖 Logistic Regression İşlemi (Model Eğitimi & Optimizasyon)
+
+📥 Gerekli Kütüphaneleri İçe Aktaralım
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
+import numpy as np
+
+📌 Model oluşturmak ve en iyi parametreleri bulmak için LogisticRegression ve GridSearchCV kullanacağız.
+
+🔧 Modeli Tanımlayalım
+
+# Lojistik Regresyon Modeli
+log_model = LogisticRegression(solver='saga', multi_class='ovr', max_iter=5000)
+
+📌 Burada:
+✔️ solver='saga' → Büyük veri setlerinde iyi çalışan bir optimizasyon yöntemi kullanıldı.
+✔️ multi_class='ovr' → "One-vs-Rest" yöntemiyle çok sınıflı sınıflandırma yapıldı.
+✔️ max_iter=5000 → Modelin daha iyi optimize olabilmesi için iterasyon sayısı artırıldı.
+
+🔍 Hiperparametre Optimizasyonu (GridSearchCV Kullanımı)
+
+Ceza (Penalty) ve C Değeri Tanımlama :
+
+penalty = ["l1", "l2"]  # L1: Lasso, L2: Ridge
+
+C = np.logspace(0, 5, 16)  
+# C > 1 → Model train setine çok dikkat eder (overfitting riski artar).
+# C < 1 → Model train seti daha az önemser, küçük coef’ler oluşturup cezalandırır (daha iyi genelleme sağlar).
+
+Grid Search ile En İyi Parametreyi Bulma
+
+grid_model = GridSearchCV(
+    log_model,
+    param_grid={"C": C, "penalty": penalty},  
+    cv=5,  # 5 katlı çapraz doğrulama
+    n_jobs=-1,  # Paralel işlem yaparak daha hızlı çalışmasını sağlıyoruz.
+    verbose=1  # İşlem sürecini takip edebilmek için
+)
+
+# Modeli Eğitme
+grid_model.fit(scaled_X_train, y_train)
+📌 Bu işlem, en iyi C ve penalty değerlerini bulmak için Grid Search yöntemini kullanır.
+
+🏆 En İyi Parametreleri Görüntüleme
+grid_model.best_params_
+
+📌 Bu, modelin en iyi sonucu verdiği parametre kombinasyonunu gösterir.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		🛠️ Penalty ve C Parametrelerinde Değişiklik Yaparsanız Ne Olur?
+
+Logistic Regression modelinizde bu iki parametre, modelin öğrenme biçimini doğrudan etkiler:
+
+📌 1. penalty = ["l1", "l2"] Değişirse Ne Olur?
+penalty=["l1"]:
+✔️ Sadece önemli özellikleri tutar, gereksiz olanları sıfıra çeker (özellik seçimi sağlar).
+✔️ Daha sade ve açıklanabilir bir model oluşturur.
+⚠️ Multicollinearity varsa daha iyi sonuç verir.
+
+penalty=["l2"]:
+✔️ Tüm özellikleri korur, ancak katsayılarını küçültür (overfitting önler).
+✔️ Büyük ve çok boyutlu veri setlerinde daha stabil çalışır.
+⚠️ Yorumlanabilirlik düşebilir.
+
+Her İkisi (["l1", "l2"]) Birlikte:
+✔️ GridSearchCV, her iki yöntemi de dener ve hangi düzenlileştirmenin daha iyi sonuç verdiğini otomatik olarak seçer.
+
+📌 2. C = np.logspace(0,5,16) Değişirse Ne Olur?
+
+C parametresi regularization strength (düzenleme gücü) olarak bilinir:
+C küçükse: Daha fazla düzenlileştirme → Aşırı öğrenme (overfitting) azalır, ancak model az öğrenebilir (underfitting).
+C büyükse: Daha az düzenlileştirme → Model train setine daha fazla uyum sağlar, ancak overfitting riski artar.
+
+🟡 Eğer C Değerlerini Değiştirirseniz:
+C = np.logspace(-3, 3, 10):
+✔️ Daha geniş bir aralık dener (0.001'den 1000'e kadar)
+✔️ Hem küçük hem büyük düzenlileştirme güçlerini test eder
+
+C = np.linspace(0.1, 10, 20):
+✔️ Dar bir aralıkta ince ayar yapar (0.1'den 10'a kadar)
+✔️ Eğer veri seti küçükse daha verimli olur
+
+🟠 C Değerinde Aşırı Artış veya Azalma:
+Çok büyük C → Model train setine aşırı uyum sağlar (overfit).
+Çok küçük C → Model yeterince öğrenemez (underfit).
+
+🚀 Özet:
+penalty: l1 özelliği azaltır, l2 stabilite sağlar. İkisini birlikte GridSearch ile kullanmak daha iyi.
+C: C değerlerini geniş bir aralıkta denemek (logspace) daha iyidir.
+En İyi Yöntem: Sizin yaptığınız gibi GridSearchCV kullanarak tüm kombinasyonları test etmek. ✅
+
+np.logspace(start, stop, num, base=10)
+
+start: Başlangıç değeri (logaritmanın üssü olarak)
+stop: Bitiş değeri (logaritmanın üssü olarak)
+num: Üretilecek sayıların miktarı
+base: Logaritma tabanı (varsayılan olarak 10)
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+📊 En İyi Modelin Katsayılarını Görüntüleme
+
+grid_model.best_estimator_  # En iyi lojistik regresyon modeli
+grid_model.best_estimator_.coef_  # Özellik katsayılarını gösterir
+
+📌 Bu katsayılar, her bir özelliğin model tahminine olan etkisini gösterir.
+
+*****************************************************************************
+
+🔍 Neden Grid Search CV Kullanıyoruz?
+
+Grid Search CV (GridSearchCV) kullanmamızın sebebi, modelimizin en iyi hiperparametre kombinasyonunu otomatik olarak bulmasını sağlamak.
+
+📌 Hiperparametre Nedir?
+
+Modelin öğrenme sürecini etkileyen, ancak doğrudan verilerden öğrenilmeyen ayarlardır. Örneğin:
+
+C (Regularization Strength): Modelin ne kadar katı veya esnek olacağını belirler.
+Penalty (Ceza Türü): L1 (Lasso) ve L2 (Ridge) kullanılarak ağırlıkların sıfıra yaklaşmasını veya küçülmesini sağlarız.
+Bu parametreleri manuel olarak denemek yerine, Grid Search CV ile farklı kombinasyonları dener ve en iyi sonucu veren ayarı seçeriz.
+
+🎯 Grid Search Kullanmanın Avantajları
+
+✅ En İyi Hiperparametreleri Otomatik Bulur
+👉 Manuel olarak her kombinasyonu denemek yerine, Grid Search tüm kombinasyonları dener ve en iyisini seçer.
+
+✅ Çapraz Doğrulama (Cross Validation) ile Daha Sağlam Model
+👉 cv=5 ile veri setini 5 parçaya ayırarak her parça için model eğitilir ve test edilir.
+👉 Bu sayede modelimizin farklı veri bölümlerinde de iyi performans gösterdiğinden emin oluruz.
+
+✅ Overfitting Riskini Azaltır
+👉 Yanlış hiperparametre seçimi overfitting (aşırı öğrenme) veya underfitting (eksik öğrenme) riskine yol açabilir.
+👉 Grid Search, modelin en iyi dengeyi bulmasını sağlar.
+
+🚀 Sonuç: Grid Search CV, modelimizin en iyi performansı vermesi için en uygun ayarları seçmemizi sağlayan güçlü bir araçtır.
+
+*****************************************************************************
+📊 Performans Metrikleri ile Model Değerlendirme
+
+📥 Gerekli Kütüphaneleri İçeri Aktarma
+
+from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay, classification_report
+📌 Bu metrikler modelimizin ne kadar başarılı olduğunu ölçmemizi sağlar.
+
+🎯 Modelin Test Verisi Üzerindeki Tahminlerini Alalım
+
+fish_pred = grid_model.predict(scaled_X_test)  # Modelin tahminlerini alıyoruz
+✅ Doğruluk Skoru (Accuracy Score) Hesaplama
+
+accuracy = accuracy_score(y_test, fish_pred)
+print(f"Model Doğruluk Skoru: {accuracy:.4f}")
+📌 Accuracy, modelin kaç doğru tahminde bulunduğunu gösterir. Ancak dengesiz veri setlerinde yanıltıcı olabilir!
+
+📊 Confusion Matrix (Karmaşıklık Matrisi) Görselleştirme
+
+-- Ham Değerlerle Confusion Matrix
+ConfusionMatrixDisplay.from_estimator(grid_model, scaled_X_test, y_test)
+📌 Bu grafik, modelin hangi sınıfları doğru ve yanlış tahmin ettiğini gösterir.
+
+-- Oransal Confusion Matrix (Normalize Edilmiş Hali)
+ConfusionMatrixDisplay.from_estimator(grid_model, scaled_X_test, y_test, normalize="true")
+
+📌 Normalize edilmiş matris, her sınıf için hataların oransal dağılımını gösterir. Yani model hangi sınıfı daha fazla veya az yanlış tahmin ediyor, bunu görebiliriz.
+
+🔎 Grafik Yorumu (Örnek Durum: Whitefish vs. Perch)
+
+📌 Dağılım grafiğine bakıldığında, bazı Whitefish’lerin Perch olarak tahmin edildiği görülüyor. Bunun sebebi, scatter plot’ta Whitefish’lerin Perch üzerine dağılmasından kaynaklanıyor.
+
+📄 Classification Report ile Detaylı Değerlendirme
+
+print(classification_report(y_test, fish_pred))
+
+📌 Bu rapor, her sınıf için
+✔️ Precision (Kesinlik) – Yanlış pozitifleri ne kadar az yaptığımızı gösterir.
+✔️ Recall (Duyarlılık) – Gerçek pozitifleri ne kadar iyi yakaladığımızı gösterir.
+✔️ F1-score – Precision ve Recall’un dengeli bir ölçüsünü verir.
+
+Sonuç:
+✔️ Precision değerine bakarak modelimizin tahmin gücünü değerlendiriyoruz.
+✔️ Hangi balık türlerinin daha çok karıştırıldığını analiz ederek modelin iyileştirilmesi gereken noktalarını belirliyoruz.
+
+*****************************************************************************
+🔁 Genel Tekrar: Multi-Class Logistic Regression ile Balık Türü Tahmini
+
+1️⃣ Veri Setinin İncelenmesi
+
+import pandas as pd
+import seaborn as sns
+import numpy as np
+
+# Veri setini yükleyelim
+df = pd.read_csv("Fish.csv")
+
+# DataFrame'e genel bakış
+df.head()
+df.info()
+df.describe()
+
+# Species kolonu içindeki benzersiz balık türleri
+df["Species"].unique()
+
+# Species kolonu içindeki her türün sayısı
+df["Species"].value_counts()
+
+# Türlerin dağılımını görselleştirelim
+sns.countplot(x=df["Species"])
+
+# Dağılımı daha iyi görmek için scatter plot
+sns.scatterplot(x="Weight", y="Height", data=df, hue="Species")
+
+# Tüm değişkenler arasındaki ilişkileri görselleştirelim
+sns.pairplot(df, hue="Species")
+
+# Korelasyonları görmek için heatmap
+sns.heatmap(df.select_dtypes(include=[np.number]).corr(), annot=True)
+
+2️⃣ Train-Test Split ve Veri Standardizasyonu
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# Bağımsız ve bağımlı değişkenleri ayıralım
+x = df.drop("Species", axis=1)
+y = df["Species"]
+
+# Veri setini eğitim ve test olarak bölelim
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=9)
+
+# Veriyi standartlaştıralım (standart sapma 1, ortalama 0 olacak şekilde)
+scaler = StandardScaler()
+scaled_X_train = scaler.fit_transform(X_train)
+scaled_X_test = scaler.transform(X_test)
+
+3️⃣ Lojistik Regresyon Modelinin Eğitilmesi
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
+
+# Lojistik regresyon modelini tanımlayalım
+log_model = LogisticRegression(solver='saga', multi_class='ovr', max_iter=5000)
+
+# Hiperparametreleri belirleyelim
+penalty = ["l1", "l2"]
+C = np.logspace(0, 5, 16)  # Ceza parametresi ve C değerleri
+
+# GridSearchCV ile en iyi parametreyi bulalım
+grid_model = GridSearchCV(
+    log_model,
+    param_grid={"C": C, "penalty": penalty}
+)
+
+# Modeli eğitelim
+grid_model.fit(scaled_X_train, y_train)
+
+# En iyi parametreleri görelim
+grid_model.best_params_
+
+# En iyi modelin katsayılarını inceleyelim
+grid_model.best_estimator_.coef_
+
+4️⃣ Modelin Performansını Değerlendirme
+
+from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay, classification_report
+
+# Test setinde tahmin yapalım
+fish_pred = grid_model.predict(scaled_X_test)
+
+# Doğruluk skoru (accuracy score) hesaplayalım
+accuracy = accuracy_score(y_test, fish_pred)
+print(f"Model Doğruluk Skoru: {accuracy:.4f}")
+
+# Confusion Matrix görselleştirelim
+ConfusionMatrixDisplay.from_estimator(grid_model, scaled_X_test, y_test)
+
+# Normalize edilmiş Confusion Matrix
+ConfusionMatrixDisplay.from_estimator(grid_model, scaled_X_test, y_test, normalize="true")
+
+# Classification Report'u yazdıralım
+print(classification_report(y_test, fish_pred))
+
+5️⃣ Grafik ve Model Yorumları
+Grafik Yorumu:
+Dağılım grafiğine bakıldığında, Whitefish türlerinin Perch türü olarak tahmin edildiği görülüyor. Bunun nedeni, scatter plot’ta Whitefish’lerin Perch üzerine dağılmasından kaynaklanıyor olabilir.
+
+Precision:
+Modelin tahmin doğruluğu, özellikle doğru pozitiflerin oranı hakkında bilgi verir.
+
+*****************************************************************************
+
+🚀 Multi-Class Logistic Regression ile Balık Türü Tahmini – Özet
+Bu rehberde, Multi-Class Logistic Regression kullanarak balık türü tahmini gerçekleştirdik. İşte genel bir özet:
+
+1️⃣ Veri İncelemesi:
+Veri setini inceledik, Species kolonu üzerinden balık türlerini ve dağılımlarını görselleştirdik. Özellikler arasındaki ilişkileri ve korelasyonları heatmap ve scatter plot kullanarak analiz ettik.
+
+2️⃣ Veri Hazırlığı:
+Bağımsız ve bağımlı değişkenleri ayırdık, ardından veri setini eğitim ve test setlerine böldük. Veriyi standardize ederek modelin daha verimli öğrenmesini sağladık.
+
+3️⃣ Model Eğitimi:
+Lojistik Regresyon modelini tanımladık ve GridSearchCV kullanarak en uygun penalty ve C parametrelerini bulduk. Modelimizi saga çözümleyici ve one-vs-rest (ovr) çok sınıflı sınıflandırma yaklaşımı ile eğittik.
+
+4️⃣ Performans Değerlendirmesi:
+Modelin doğruluğunu accuracy score ile ölçtük. Confusion matrix ile modelin doğru ve yanlış tahminlerini görselleştirdik. Classification report ile precision, recall ve f1-score değerlerini inceledik.
+
+5️⃣ Grafik ve Yorumlar:
+Grafikleri yorumladık ve Whitefish türünün bazen Perch olarak tahmin edildiğini fark ettik. Bu hatanın dağılım grafiklerinden kaynaklandığını gözlemledik.
+
+*****************************************************************************
+    🔧 Lojistik Regresyon Modelinin Tanımlanması ve Parametre Seçimi
+
+log_model = LogisticRegression(solver='saga', multi_class='ovr', max_iter=500
+
+1️⃣ solver='saga'
+solver parametresi, lojistik regresyonun optimizasyon algoritmasını seçer. Bu parametrede çeşitli seçenekler bulunur:
+
+'newton-cg': Newton-Raphson yöntemini kullanır, genellikle küçük veri setlerinde iyi performans gösterir.
+'lbfgs': Limited-memory Broyden–Fletcher–Goldfarb–Shanno (LBFGS) algoritmasını kullanır. Küçük veri setleri için iyidir.
+'liblinear': Küçük veri setlerinde L1 ve L2 cezası uygulandığında genellikle kullanılır.
+'saga': Stochastic Average Gradient Descent algoritması, büyük veri setleri için önerilir. Bu yöntem, L1 ve L2 cezasını daha verimli şekilde işler ve çoklu sınıflı sınıflandırma için uygundur.
+Neden 'saga' kullanıldı?
+
+Büyük veri setlerinde verimli çalışır ve hem L1 hem de L2 ceza terimlerini destekler. Bu nedenle saga, çok sınıflı sınıflandırma (multi_class='ovr') için iyi bir tercihtir.
+
+2️⃣ multi_class='ovr'
+multi_class parametresi, çok sınıflı sınıflandırma yöntemini belirler. İki farklı seçenek bulunur:
+
+'ovr' (One-vs-Rest): Her sınıf için ayrı bir ikili sınıflandırıcı oluşturur. Bu yöntemde, model her bir sınıfı diğerlerinden ayırmaya çalışır.
+'multinomial': Tüm sınıflar arasında tek bir model ile optimizasyon yapılır, yani çoklu sınıf için ortak bir model öğrenilir. Bu genellikle L2 cezası ile daha iyi sonuçlar verir.
+
+Neden 'ovr' kullanıldı?
+
+'ovr' genellikle daha yaygın kullanılır, çünkü her sınıf için ayrı bir ikili model eğitildiğinden, sınıflar arasındaki karmaşayı azaltabilir.
+'multinomial' kullanmak, büyük veri setlerinde daha karmaşık olabilir ve çok sınıflı sınıflandırma için daha hassas optimizasyon gerektirebilir.
+
+3️⃣ max_iter=5000
+max_iter, modelin eğitim sırasında kaç iterasyon yapılacağını belirler. Bu parametre, modelin optimizasyon sürecinin bitmesi için gerekli olan iterasyon sayısını kontrol eder.
+
+Varsayılan değer genellikle 100'dür.
+Daha büyük veri setlerinde ve karmaşık modellerde iterasyon sayısının artırılması gerekebilir.
+
+Neden 5000 kullanıldı?
+
+Büyük veri setleri ve karmaşık ilişkiler için modelin doğru şekilde optimize edilmesi adına iterasyon sayısı artırıldı. Bu, modelin daha fazla zaman harcayarak daha iyi sonuçlar üretmesini sağlar.
+Eğer 500 olursa ne olur?
+
+Eğer max_iter=500 gibi daha küçük bir değer kullanılırsa, model daha erken durur ve bazen optimize olmamış sonuçlar verebilir. Özellikle büyük veri setlerinde ve karmaşık ilişkilerde modelin daha fazla iterasyona ihtiyacı olabilir.
+
+4️⃣ penalty (Ceza Terimi)
+penalty parametresi, modelin regularization (ceza) türünü belirler. Regularization, modelin karmaşıklığını azaltarak overfitting riskini engeller. İki tür penalty seçeneği vardır:
+
+'l1': Lasso regularization. Özelliklerin çoğunu sıfıra çekmeye çalışır. Özellik seçimi sağlar.
+'l2': Ridge regularization. Ağırlıkları küçültür, ancak sıfıra çekmez.
+'none': Regularization uygulanmaz.
+
+Neden L1 Kullanıldı? 🤔
+
+L1 (Lasso Regularization), özellik seçimi (feature selection) sağladığı için tercih edilmiş olabilir. İşte detaylı açıklaması:
+
+💡 L1 (Lasso) Regularizasyonunun Avantajları:
+
+1️⃣.1️⃣ Özellik Seçimi (Feature Selection):
+
+L1 düzenlileştirme, bazı koefisiyentleri sıfıra çeker, böylece gereksiz özellikleri otomatik olarak elemine eder.
+Çok fazla özelliğin olduğu veya bazı özelliklerin gereksiz olduğu durumlarda daha iyi performans gösterir.
+2️⃣.2️⃣ Seyrek Modeller (Sparse Models):
+
+L1, seyrek (sparse) bir model oluşturur. Bu, daha az bellek kullanımı ve daha hızlı tahmin anlamına gelir.
+3️⃣.3️⃣ Aşırı Öğrenmeyi (Overfitting) Önleme:
+
+Özellikle çok boyutlu (high-dimensional) veri setlerinde modelin genelleme yeteneğini artırır.
+
+🚫 Neden L2 Kullanılmadı?
+
+L2 (Ridge Regularization) güçlü bir düzenlileştirme yöntemi olsa da, bazı durumlarda uygun bir tercih olmayabilir. İşte nedenleri:
+
+🟡 1. Özellik Seçimi Yapılamaması:
+L2, tüm özelliklerin katsayılarını küçültür ancak hiçbirini sıfıra indirmez.
+Eğer veri setinde gereksiz özellikler veya gürültülü veriler varsa, L2 bu özellikleri tamamen devre dışı bırakmaz.
+Bu durumda L1 daha etkili olur, çünkü gereksiz özellikleri tamamen ortadan kaldırır.
+
+
+🆚 L1 ve L2 Farkının Özet Tablosu:
+
+
+Özellik					L1 (Lasso)		    L2 (Ridge)
+
+Amaç				Gereksiz özellikleri sıfırlamak	Koefisiyentleri küçültmek
+Özellik Seçimi				✅ Var			❌ Yok
+Multicollinearity			Daha etkili çözüm			Özellikleri küçültür ama tutar
+Model Yorumlanabilirliği			✅ Yüksek	         ❌ Düşük
+Çoklu Sınıf (OvR)				✅ İyi		         🟡 Orta 
+Büyük Veri Desteği (saga ile)		✅ Çok İyi	         🟡 Orta
+
+
+5️⃣ C (Regularization Strength)
+C parametresi, regularization gücünü kontrol eder. Düşük C değeri, daha güçlü regularization anlamına gelir, yani model daha basitleşir. Yüksek C değeri ise daha az regularization ve daha fazla esneklik sağlar.
+
+Küçük C → Model daha basitleşir, overfitting engellenir.
+Büyük C → Model daha karmaşık olur, overfitting riski artar.
+Neden C=1 kullanıldı?
+
+Bu değeri logaritmik bir aralıkta (örneğin, np.logspace) genişletmek genellikle daha iyi sonuçlar verir. C=1 genellikle başlangıç için uygun bir seçimdir.
+6️⃣ tol (Tolerance)
+tol parametresi, modelin optimizasyonunun sonlanması için kabul edilen hata toleransını belirler.
+
+Küçük tol değeri, daha hassas bir optimizasyon sağlar, ancak daha fazla zaman alabilir.
+Neden tol=1e-4 kullanıldı?
+
+Çoğu durumda bu değer yeterli olur ve modelin eğitim sürecini makul bir şekilde sonlandırır.
+7️⃣ warm_start
+warm_start, önceki modelin sonuçlarını kullanarak eğitime devam etmek için kullanılır.
+
+True: Eğitilen modelin sonuçları bir sonraki iterasyona aktarılır.
+False: Model sıfırdan başlar.
+Neden warm_start=False kullanıldı?
+
+Modelin sıfırdan öğrenmesi istendi, böylece her seferinde yeni baştan başlar ve farklı parametrelerle daha güvenilir sonuçlar elde edilir.
+Özet:
+'saga' solver'ı büyük veri setlerinde iyi çalışır.
+'ovr' çok sınıflı sınıflandırma için yaygın bir tercihtir.
+max_iter=5000 iterasyon sayısı daha büyük veri setlerinde modelin daha iyi optimizasyon yapmasını sağlar.
+penalty='l2' ve C=1 genellikle dengeli sonuçlar verir.
+Hangi parametrelerin kullanılacağını belirlemek, modelin genel doğruluğu ve performansını etkileyebilir.
+
+
+
+
+
+
+
+
+
+			
+

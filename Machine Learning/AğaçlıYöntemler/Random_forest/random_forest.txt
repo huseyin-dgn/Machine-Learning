@@ -1,0 +1,369 @@
+🌲 Random Forest Nedir?
+Random Forest, birçok karar ağacının (Decision Tree) birleşimiyle oluşan güçlü bir makine öğrenmesi algoritmasıdır. 🌳🌳🌳
+Bu algoritma, ensemble learning yöntemini kullanır. Yani birden fazla modelin sonucunu birleştirerek daha doğru tahminler yapar. 🤝📊
+
+🌳 Decision Tree Nedir?
+
+Decision Tree, veriyi dallara ayırarak sınıflandırma veya regresyon yapar. 🌿 Her düğümde bir özellik üzerinden karar verilir ve veri dallara ayrılır.
+
+🤔 Peki, Random Forest ile Decision Tree Arasındaki Fark Ne?
+
+🆚 Karşılaştırma	🌳 Decision Tree		  🌲 Random Forest
+🎯 Genel Yapı	Tek bir ağaç kullanılır	Birden fazla karar ağacı kullanılır
+🛡️ Overfitting	Overfitting’e yatkındır	Overfitting riski daha düşüktür
+📈 Doğruluk	Daha düşük olabilir	Genelde daha yüksek doğruluk sağlar
+🧠 Karar Verme	Tek ağacın sonucuna dayanır	Birçok ağacın çoğunluk kararını alır (oylama yöntemi)
+
+🛠️ Random Forest Nasıl Çalışır?
+
+📊 Veri Bölme (Bootstrapping): Eğitim verisinden rastgele örnekler alınır.
+🌿 Birden Fazla Karar Ağacı: Her örnek için farklı bir karar ağacı eğitilir.
+🗳️ Oylama (Classification) veya Ortalama Alma (Regression):
+Sınıflandırmada: Birden fazla ağacın çoğunluk kararı alınır. 🗳️
+Regresyonda: Ağaçların tahminlerinin ortalaması alınır. 📈
+💎 Diğer Regresyon Modellerinden Ayıran Özellikler:
+✅ Doğruluk: Birden fazla modelin birleşimi olduğu için daha kararlıdır. 📊
+✅ Overfitting Azlığı: Birden fazla ağacın birleşimi genelde daha iyi genelleme sağlar. 🛡️
+✅ Özellik Önemi: Hangi değişkenin daha önemli olduğunu gösterebilir. 💡
+✅ Lineer Olmayan Verilere Uyum: Karmaşık ilişkileri iyi öğrenebilir. 🔄
+
+💡 Ne Zaman Random Forest Kullanılır?
+
+Karmaşık ve büyük veri setlerinde 📊
+Doğruluğun önemli olduğu sınıflandırma veya regresyon problemlerinde 🎯
+Veri setinde çok sayıda özellik (feature) olduğunda 📈
+Overfitting’ten kaçınmak istediğinizde 🛡️
+
+	🐧 Penguen Türlerini Random Forest ile Sınıflandırma –🌲
+
+1️⃣ Veri Hazırlığı (Data Preparation) 📊
+Veriyi temizleme, eksik değerleri doldurma, özellik mühendisliği ve normalizasyon işlemleri yapılır.
+
+df.isnull().sum()
+df.info()
+df["Class"].unique()
+df["Class"].value_counts()
+df.columns
+df.corr(numeric_only=True)
+
+2️⃣ Eğitim ve Test Seti Ayrımı (Train-Test Split) ✂️
+Veriyi eğitim (train) ve test (test) setlerine ayırarak modelin doğruluğunu test etmek için verileri ayırmak önemlidir.
+
+3️⃣ Model Kurulumu ve Eğitimi (Model Setup & Training) 🌲
+Random Forest gibi modelin kurulumu yapılır, ardından eğitim verileriyle model eğitilir.
+
+4️⃣ Hiperparametre Araması (Hyperparameter Tuning) 🧪
+Modelin performansını iyileştirmek için hiperparametre araması yapılır. Örneğin, ağaç sayısı, maksimum derinlik, minimum örnek sayısı gibi parametreler ayarlanabilir.
+
+5️⃣ Model Değerlendirmesi (Model Evaluation) 📊
+Eğitim tamamlandıktan sonra modelin başarısını test seti üzerinde değerlendirirsiniz. Başarı metriği olarak doğruluk (accuracy), F1 skoru, ROC eğrisi gibi kriterler kullanılabilir.
+
+6️⃣ En İyi Ağaç Sayısının Belirlenmesi 🌳
+Hiperparametre araması ile en iyi ağaç sayısını belirleyerek modelin daha iyi performans göstermesini sağlayabilirsiniz.
+
+
+			📊🔍🌡️	Veri Görselleştirme İşlemleri 📊🔍🌡️
+
+1️⃣ Sınıf Dağılımı - Count Plot 📊
+
+sns.countplot(x="Class", data=df)
+x: Verinin hangi sütunu kullanarak sıklığını göstereceğinizi belirtir. Burada "Class" sütunu, sınıf etiketlerinin sayısını gösterir.
+data: Hangi DataFrame'den veri alacağınızı belirtir.
+Başlık: Sınıf Etiketlerine Göre Dağılımı Göster
+
+2️⃣ Alan ve Çevre Arasındaki İlişki - Scatter Plot 🔵
+
+sns.scatterplot(x="Area", y="Perimeter", data=df, alpha=0.3, hue="Class")
+x ve y: İki özellik arasındaki ilişkiyi görselleştirir. Burada "Area" (alan) ve "Perimeter" (çevre) arasındaki ilişkiyi gösterir.
+alpha: Noktaların şeffaflık derecesi. 0-1 arası bir değer alır, burada 0.3 kullanılmıştır, yani noktalar biraz şeffaf.
+hue: Veriyi renk kategorilerine ayırır, burada "Class" kullanılarak her sınıf için farklı renkler atanır.
+
+3️⃣ Major Axis Length ve Eccentricity Arasındaki İlişki - Joint Plot 🔶
+
+sns.jointplot(kind="hex", x="Major_Axis_Length", y="Eccentricity", data=df)
+kind: Görselleştirmenin türü, burada "hex" kullanılarak yoğunlukları hexagonal harita ile gösteriyor.
+x ve y: Görselleştirilecek iki özellik. Burada "Major_Axis_Length" (ana eksen uzunluğu) ve "Eccentricity" (eksantriklik) arasındaki ilişkiyi gösteriyor.
+
+4️⃣ Sınıf Etiketlerine Göre Özelliklerin İlişkisi - Pair Plot 🔍
+
+sns.pairplot(df, hue="Class", palette="colorblind")
+hue: Her bir "Class" için farklı renkler ile görselleştirme.
+palette: Renk paleti seçimi. Burada "colorblind" paleti, renk körlüğü olanlar için uygun bir palettir.
+
+5️⃣ Korelasyon Matrisinin Görselleştirilmesi - Heatmap 🌡️
+
+sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="YlGnBu")
+df.corr(numeric_only=True): Verinin sayısal özelliklerinin korelasyonunu hesaplar.
+annot: Her hücrenin içine korelasyon değerlerini ekler.
+cmap: Renk paleti. Burada "YlGnBu", sarı, yeşil ve mavi tonlarını içeriyor.
+
+
+			📊✂️ Eğitim ve Test Setlerine Ayırma 📊✂️
+
+1️⃣ Veri Hazırlığı - Bağımsız ve Bağımlı Değişkenlerin Ayrılması
+
+x = df.drop("Class", axis=1)
+y = pd.get_dummies(df["Class"], drop_first=True)
+
+x (Bağımsız Değişkenler):
+Bu satırda, "Class" sütunu dışındaki tüm sütunlar (özellikler) bağımsız değişkenler olarak alınır. Yani, x veri çerçevesi sadece "Class" dışında kalan sütunlardan oluşur. Bu, modelin tahmin yaparken kullanacağı özellikleri temsil eder.
+
+y (Bağımlı Değişken):
+y, sınıf etiketlerini içerir. Fakat, "Class" sütunu kategorik bir veri olduğu için, bunu modelin anlayacağı şekilde dönüştürmemiz gerekir. pd.get_dummies fonksiyonu bu dönüşümü sağlar, yani one-hot encoding işlemi yapar.
+
+drop_first=True parametresi, ilk kategoriyi düşürerek modelin gereksiz yere çoklu lineer ilişkiye girmesini engeller. Bu, genellikle dummy variable trap'ten kaçınmak için kullanılır. Örneğin, "Class" sütununda "A", "B", "C" gibi üç sınıf varsa, sadece "B" ve "C" sınıfları kodlanır; "A" ise varsayılan kabul edilir.
+
+2️⃣ Eğitim ve Test Setlerine Bölme
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    x, y, test_size=0.1, random_state=9)
+train_test_split:
+
+Bu fonksiyon, verinizi eğitim ve test setlerine böler.
+
+x: Bağımsız değişkenlerin bulunduğu veri seti.
+
+y: Bağımlı değişkenlerin (sınıflar) bulunduğu veri seti.
+
+test_size=0.1: Test setinin büyüklüğü %10 olarak belirlenmiştir. Bu durumda, veri setinizin %90'ı eğitim seti olarak kullanılacak, geri kalan %10'u ise modelin doğruluğunu test etmek için ayrılacak.
+
+random_state=9: Bu parametre, veri bölme işlemini tekrarlanabilir hale getirir. Farklı bir random_state değeri verirseniz, veri farklı şekilde bölünür.
+
+Yorum: Test setinin boyutunu %10 olarak seçmişsiniz çünkü veri setinizin büyük olduğunu belirttiniz. Bu durumda, test setini küçük tutmak mantıklı çünkü modelin eğitim için daha fazla veri ile çalışması istenir.
+
+3️⃣ Veri Seti Boyutları
+
+len(X_train)
+len(X_test)
+
+len(X_train): Eğitim setinin veri boyutunu gösterir. Bu, modelin eğitim sırasında kullanacağı örnek sayısını belirtir.
+
+len(X_test): Test setinin veri boyutunu gösterir. Bu, modelin doğruluk oranını test etmek için kullanılan örnek sayısını belirtir.
+
+Yorum-
+Eğitim setiniz test setinden 9 kat daha büyük olacaktır, çünkü test seti %10, eğitim seti ise %90'dır.
+Test setinin boyutu, eğitim setine göre çok küçük olsa da, bu veri büyüklüğü yeterli olduğu için modelin doğruluğunu test etmek için yeterlidir.
+
+	      🔍🌲 Hiper Orman: GridSearchCV ile RandomForest Parametre Optimizasyonu 🔍🌲
+
+Bu bölümde, RandomForestClassifier modelini optimize etmek için GridSearchCV kullanarak çeşitli hiperparametreler üzerinde arama yapıyoruz. Hedefimiz, en iyi parametre kombinasyonunu bulmak ve modelin performansını artırmaktır.
+
+
+🔍 Kod: Hiper Orman için Parametre Optimizasyonu 🔍
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+
+# Denenecek parametreler
+n_est = [9, 64, 128, 200]
+max_feat = [1, 2, 3, 4]
+bootstrap_sec = [True, False]
+oob = [True, False]
+
+parameters = {
+    "n_estimators": n_est,
+    "max_features": max_feat, 
+    "bootstrap": bootstrap_sec,
+    "oob_score": oob
+}
+
+# Modeli oluşturuyoruz
+random_forest = RandomForestClassifier()
+
+# GridSearchCV ile parametre araması yapıyoruz
+grid = GridSearchCV(random_forest, parameters)
+
+# Modeli eğitim verisiyle eğitiyoruz
+grid.fit(X_train, y_train)
+
+# En iyi modeli ve parametreleri alıyoruz
+grid.best_estimator_
+
+# En iyi parametreleri yazdırıyoruz
+grid.best_params_
+
+# Test verisiyle tahmin yapıyoruz
+pilav_pred = grid.predict(X_test)
+
+
+🔍🌲 Parametrelerin Açıklamaları 🔍🌲
+
+1️⃣ n_estimators (Ağaç Sayısı)
+
+n_est = [9, 64, 128, 200]
+Ağaç sayısını belirler. Random Forest modelinde kaç adet karar ağacı kullanılacağını ayarlar. Ağaç sayısı arttıkça model daha güçlü hale gelir, ancak hesaplama maliyeti de artar.
+Bu parametre için farklı değerler 9, 64, 128 ve 200 denenmiştir.
+
+2️⃣ max_features (Maksimum Özellik Sayısı)
+
+max_feat = [1, 2, 3, 4]
+Bu parametre, her bir karar ağacının eğitiminde kullanılan özellik (feature) sayısını belirler.
+Daha düşük bir değer, modelin daha basit hale gelmesine, daha yüksek bir değer ise modelin daha karmaşık ve hassas olmasına yol açar. Burada 1, 2, 3 ve 4 özellikleri denenmiştir.
+
+max_features="sqrt" 
+Bu parametre, özellikle rastgele orman (Random Forest) gibi modellerde, her bölme için kullanılacak özellik sayısının toplam özellik sayısının karekökü kadar olmasını belirler. Bu, modelin çeşitliliğini artırmaya ve aşırı öğrenmeyi (overfitting) önlemeye yardımcı olur.
+
+3️⃣ bootstrap (Veri Seçimi Yöntemi)
+
+bootstrap_sec = [True, False]
+Bootstrap parametresi, her ağaç için eğitim verisinin nasıl seçileceğini belirler.
+True: Her ağaç için rastgele veriler seçilir (veri örneklemesi).
+False: Her ağaç, tüm veriyi kullanır.
+Bu seçenek, modelin çeşitliliğini artırmak ve aşırı uyumdan kaçınmak için önemlidir.
+
+4️⃣ oob_score (Out-of-Bag Skoru)
+
+oob = [True, False]
+Out-of-Bag (OOB), yalnızca bootstrap=True olduğunda çalışır.
+Bu parametre, eğitim verisi dışında kalan veriler ile modelin doğruluğunu hesaplamanızı sağlar. Yani, her ağaç eğitimde kullanılmayan verileri kullanarak doğruluk ölçümü yapar.
+Bu, ekstra test verisi kullanmadan modelin başarısını değerlendirmek için faydalıdır.
+
+ 🚀 Sonuçların Alınması  🚀
+
+grid.best_estimator_: Bu komut, GridSearchCV ile en iyi performansı gösteren modelin hyperparametrelerle eğitilmiş versiyonunu döndürür.
+
+grid.best_params_: Bu komut, en iyi sonucu veren parametre kombinasyonlarını verir. Örneğin:
+
+RandomForestClassifier(max_features=1, n_estimators=128)
+Bu, en iyi performansı gösteren parametrelerdir: 128 ağaç ve 1 özellik kullanarak.
+
+Modelin Test Edilmesi:
+
+pilav_pred = grid.predict(X_test):
+Bu satır, test verisi üzerinde eğitilmiş en iyi RandomForestClassifier modelini kullanarak tahmin yapar ve pilav_pred değişkenine kaydeder.
+
+Bu işlem, hyperparametre optimizasyonu ile modelin doğruluğunu artırmayı amaçlar ve en iyi parametreler ile tahmin yapmayı sağlar.
+
+		📊💡 Değerlendirme: Model Performansı Analizi 📊💡
+
+from sklearn.metrics import ConfusionMatrixDisplay, classification_report
+
+# Confusion Matrix Görselleştirmesi
+ConfusionMatrixDisplay.from_estimator(grid, X_test, y_test, normalize="true")
+
+# Modelin değerlendirilmesi
+print(classification_report(y_test, pilav_pred))
+
+🔥 Confusion Matrix ve classification_report Sonuçları 🔥
+
+1️⃣ Confusion Matrix:
+
+Confusion Matrix'in görselleştirilmesi ile modelin doğru ve yanlış tahminlerini daha kolay görselleştirebiliriz.
+normalize="true" parametresi, matrisin normalize edilmesini sağlar, böylece her sınıfın model tarafından ne kadar doğru sınıflandırıldığı oran olarak gösterilir.
+
+2️⃣ classification_report:
+Modelin precision, recall, f1-score ve accuracy gibi önemli metriklerini gösteren bir rapordur.
+
+Rapor Sonuçları 📊
+
+Precision: Modelin doğru şekilde True veya False sınıfını tahmin etme oranını gösterir.
+False: 0.94, True: 0.89
+Recall: Modelin, gerçekte True veya False olanları doğru tahmin etme oranıdır.
+False: 0.87, True: 0.95
+F1-Score: Precision ve recall'un harmonik ortalamasıdır. Dengeyi ölçer.
+False: 0.91, True: 0.92
+Accuracy: Modelin genel doğruluk oranıdır.
+Genel doğruluk: 0.91
+
+Modelin genel doğruluğu %91 olarak yüksek.
+False sınıfının precision'ı yüksek (0.94) ancak recall'ı biraz düşük (0.87).
+True sınıfı daha yüksek bir recall'a sahip (0.95), yani True sınıfındaki verileri doğru sınıflandırma oranı çok iyi.
+Bu rapor, modelin True sınıfı üzerinde daha iyi performans gösterdiğini, ancak False sınıfındaki bazı verileri kaçırabileceğini gösteriyor.
+
+		📈🔍 Estimator Sayısı Belirleme ve Performans Değerlendirmesi 📈🔍
+
+KOD BÖLÜMÜ ;
+
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+
+hata = []
+yanlıs_secim = []
+
+# Ağaç sayısını 1'den 130'a kadar deniyoruz
+for n in range(1, 130):
+    rand_forest_class = RandomForestClassifier(n_estimators=n,
+                                               bootstrap=True,
+                                               oob_score=False,
+                                               max_features=1)
+    
+    rand_forest_class.fit(X_train, y_train)
+    pirinc_pred = rand_forest_class.predict(X_test)
+    
+    # Hata oranını hesaplıyoruz
+    error = 1 - accuracy_score(y_test, pirinc_pred)
+
+    # Yanlış sınıflandırılan örneklerin sayısını buluyoruz
+    sample = y_test.to_numpy()
+    sample = sample.reshape(1, -1)[0]
+    n_missed = np.sum(pirinc_pred != sample)
+---------------------------------------------------------------------------
+
+Kodda sample Ne İşe Yarıyor?
+
+sample = y_test.to_numpy()
+sample = sample.reshape(1,-1)[0]
+
+
+Bu iki satırın yaptığı şey şu:
+
+y_test.to_numpy() → y_test serisini NumPy dizisine çeviriyor.
+sample.reshape(1,-1)[0] → Bu, normalde y_test zaten 1D (tek boyutlu) bir dizi olduğu için gereksiz ama olay şu:
+Eğer y_test tek satır ve çok sütundan oluşan bir şeyse, bunu dümdüz 1D dizi yapmaya çalışıyor.
+Ama y_test zaten tek boyutlu bir seri olduğundan, bu reshape işlemi boşa gidiyor. 
+
+-------------------------------------------------------------------------
+    hata.append(error)
+    yanlıs_secim.append(n_missed)
+
+# Ağaç sayısına karşı hata oranı ve yanlış sınıflandırma sayısını çiziyoruz
+plt.plot(range(1, 130), hata, label="Hata Oranı", color="red")
+plt.plot(range(1, 130), yanlıs_secim, label="Yanlış Seçim Sayısı", color="blue")
+
+# Görselleştirmeyi açıklayalım
+plt.xlabel('Ağaç Sayısı (n_estimators)')
+plt.ylabel('Değerler')
+plt.title('Ağaç Sayısına Göre Performans Değişimi')
+plt.legend()
+
+# Confusion Matrix ile son değerlendirmeyi yapıyoruz
+ConfusionMatrixDisplay.from_estimator(rand_forest_class, X_test, y_test)
+
+# Sınıflandırma raporunu yazdırıyoruz
+print(classification_report(y_test, pirinc_pred))
+
+
+🌳📉 Ağaç Sayısının Performansa Etkisi 🌳📉
+1️⃣ Model Performansını İzleme:
+
+Hata oranı (hata) ve yanlış seçim sayısı (yanlıs_secim), her bir ağaç sayısı için modelin başarısını izlememize yardımcı olur.
+Ağaç sayısı arttıkça, hata oranı ve yanlış seçim sayısı nasıl değişiyor?
+
+2️⃣ Grafikler:
+plt.plot(...) fonksiyonu ile ağaç sayısına göre hata oranı ve yanlış seçim sayısını çiziyoruz.
+X ekseni: Ağaç sayısı (1'den 130'a kadar)
+Y ekseni: Hata oranı ve yanlış seçim sayısı.
+
+3️⃣ Confusion Matrix:
+Confusion Matrix, modelin doğru ve yanlış sınıflandırmalarını görsel olarak sunar. Bu, modelin ne kadar doğru tahmin yaptığını hızlıca anlamanızı sağlar.
+
+4️⃣ Sınıflandırma Raporu:
+Precision, Recall, F1-Score ve Accuracy gibi metrikler, modelin genel başarısını gösterir.
+
+Sonuçlar:
+Ağaç sayısı arttıkça hata oranı ve yanlış seçim sayısı nasıl değişiyor, bu modelin doğru ağaç sayısını bulmaya yardımcı olur.
+Hata oranındaki azalma ve yanlış seçim sayısındaki düşüş, modelin genel doğruluğunun arttığını gösterir.
+Confusion Matrix ile her sınıfın doğru ve yanlış sınıflandırmalarını inceleyebilirsiniz.
+
+
+
+
+
+
+
+
+
+
+
